@@ -4,13 +4,13 @@
 \usepackage{multirow}
 \usepackage{geometry}
 \usepackage{longtable}
-\title{这整的啥玩意啊}
-\author{万物主宰——王成航}
-\date{2020.2}
+\usepackage{pdfpages}
+\title{First Assignment}
+\author{王成航 张申铎 王泽昊}
 % \usepackage[authoryear]{gbt7714}  % 国标
-
 \begin{document}
-\maketitle
+\includepdf[width=\paperwidth]{FM.pdf}
+\newpage
 \tableofcontents
 \thispagestyle{empty}
 \newpage
@@ -20,19 +20,19 @@
 \par 早在20世纪末, 互联网便已经展现出了势不可挡的趋势, 随着互联网的迅速发展, 大数据成为了这个信息时代的标志词. 它的发展迅速到甚至可能我们连什么是大数据都不清楚, 就已经在生活的各个方面受到它的影响了. IBM提出大数据有5个特点, 分别是Volume、Velocity、Variety、Value、Veracity, 分别代表着大量、高速、多样、低价值密度和真实性. \figref{fig:data} 描述了近过去十年以及未来五年的数据量增长趋势, 可以很明显的看出数据量的增长目前还是呈指数形式. 这也意味着数据量的增长会犹如指数爆炸一般十分迅猛, 因此, 如何有效地利用如此海量的数据便是当务之急. 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=0.6\textwidth]{Bigdata}
+	\includegraphics[width=0.45\textwidth]{Bigdata}
   	\caption{Rapid growth of data.\label{fig:data}}
 \end{figure}
 \par 由于对于数据处理的需求, 一些技术如“数据挖掘”,、“机器学习”便被提了出来, 它们旨在运用现代强大的计算机和优秀的程序与算法. 对当今海量的数据进行处理, 从而找到一些有价值的信息. 随着数据量的大幅增大, 单台计算机已经无法满足数据处理的需要, 而以Hadoop为代表的开源分布式计算架构则提供了分布式计算的技术支持. 同时, 随着 Caffe 和 TensorFlow 等高效率的深度学习框架被开源, 许多小型公司甚至个人也具备了自主研发改进算法和模型的能力. 互联网在不断发展, 数据的生成也不会停下脚步. 
 \par 如\figref{fig:data} 所示, 2020年全球数字宇宙将会已经超过50ZB, 虽然我们目前还不清楚这些数据如何被更加充分的利用, 不过可以肯定的是, 数据会成为一项重要的资源, 在大数据时代, 特别是未来的智能化时代, 如机器学习这种对于数据的处理技术一定会展现出更大的潜能. 正如马云所言, 人类社会的未来一定会进入数据处理技术( Data Technology, DT )时代.
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=0.7\textwidth]{GoogleTrend}
+	\includegraphics[width=0.85\textwidth]{GoogleTrend}
   	\caption{Google Trend about Machine Learning.\label{fig:GoogleTrend}}
 \end{figure}
 \par \figref{fig:GoogleTrend} 是“机器学习”这一词语在研究领域的谷歌搜索热度趋势\cite{GT}, 可以看出, 自2015年以来, 机器学习的搜索热度便急转直上, 这一结果可能要归功于Google旗下的DeepMind以及他们的AlphaGo. AlphaGo是一款通过机器学习构建出的围棋对弈系统, 其第一代系统于2015年3月与顶尖棋手李世乭进行了对弈, 并最终以3:1的大比分取得胜利. 经此一役, AlphaGo以及其背后的机器学习进入了大众的视野. 
 \par 值得留意的是, 这项数据是从2004年开始的, 也就是说Google公司至少从2004年就开始不惜耗费十分巨大的财力与物力来保存这些来自全球的庞大的搜索数据了. 同样的, Facebook也在运用机器学习对每一个用户的每一条浏览记录, 每一次点赞进行分析, 从而为用户推送最为合适的内容以及广告. 国内公司对机器学习也有十分深入的应用, 如Alibaba的人脸支付, 能够在几亿用户中大规模正式上线人脸支付系统, 说明了Alibaba公司本身对于机器学习中人脸识别这一技术已经研发的十分完善. 而从2000年开始就有即时通讯业务的Tencent公司也将机器学习应用至很多产品, 如QQ中“可能认识的人”, 或者音乐软件, 视频软件里可能喜欢的视频或者音乐, 里面都有机器学习的影子.
-\par 类比于人脑的学习过程, 机器的学习似乎具有相似的性质, 人脑的学习过程(\figref{fig:Brian} )可以抽象为从经验之中总结出规律, 遇到新问题时基于过去总结而来的规律做出判断; 而机器学习的学习过程(\figref{fig:Machine} )则可以抽象为计算机从人为输入的历史数据中训练出模型, 对于新出现的的数据, 由已经训练好的模型给出预测. \figref{fig:AI}
+\par 类比于人脑的学习过程, 机器的学习似乎具有相似的性质, 人脑的学习过程(\figref{fig:Brian} )可以抽象为从经验之中总结出规律, 遇到新问题时基于过去总结而来的规律做出判断; 而机器学习的学习过程(\figref{fig:Machine} )则可以抽象为计算机从人为输入的历史数据中训练出模型, 对于新出现的的数据, 由已经训练好的模型给出预测. 
 \begin{figure}[htbp]
 	\centering
 	\begin{minipage}[t]{0.45\textwidth}
@@ -49,7 +49,7 @@
 \par 但机器学习本身却并不是一个十分年轻的事物, 它最早的应用可以追溯至1952年IBM工程师Arthur Samuel写出的一个跳棋程序, 这个程序通过学习走得好和不好的棋局, 为下棋者做出指导\cite{AS1}\cite{AS2}. 在过去的几年里, 机器学习、人工智能乃至深度学习都一度成为了资本投资的风口, 但其实此三者之间其实是包含与被包含的关系, 如同俄罗斯套娃一般(\figref{fig:AI} ).
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=0.6\textwidth]{AI}
+	\includegraphics[width=0.5\textwidth]{AI}
   	\caption{AI, Machine Learning \& Deep Learning.\label{fig:AI}}
 \end{figure}
 \subsection{人工智能}
@@ -77,13 +77,13 @@
 \par 在普通的机器学习问题中, 我们需要计算机去学习的规则,往往可以表达成输入数据的函数或者复合函数, 而在这些规则中有一部分的复合函数的复合次数甚至高达数十次乃至上百次, 对于这些复合函数十分复杂的问题, 我们称它们为深度学习问题, 深度学习的“深度”, 便指的是这种多次复合函数的次数. 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=0.6\textwidth]{DNN}
+	\includegraphics[width=0.4\textwidth]{DNN}
   	\caption{A three-layer full connected neural network\label{fig:DNN}}
 \end{figure}
 \par 而在实际的深度学习问题中, 这种多次的复合函数总是通过一种名叫“神经网络”的结构来实现的, \figref{fig:DNN} 便是一个三层的神经网络. “神经网络”这一术语的灵感来源于神经生物学. 虽然它的每一层十分简单, 但经过许多层的堆叠后, 往往可以对一些十分复杂的问题如图像识别等产生令人十分震惊的效果. 正像人的大脑虽然只由一个个细胞构成, 但却有十分复杂的智慧一样. 有监督的神经网络机器学习的基本原理如\figref{fig:net} , 它通过预测值与真实值的误差来调整自己每一层的参数, 使预测值变得更加精准.
 \begin{figure}[htbp]
 	\centering
-	\hspace{-30pt}\includegraphics[width=0.6\textwidth]{Net}
+	\hspace{-30pt}\includegraphics[width=0.5\textwidth]{Net}
   	\caption{The workflow of neural network ML.\label{fig:net}}
 \end{figure}
 \section{机器学习的发展与应用}
@@ -97,11 +97,15 @@
 \par 此时的研究热门都聚集于“从样例中学习”, 包括监督学习, 以及无监督学习. 其中, 以符号主义机器学习和基于神经网络的连接主义机器学习为主流, 前者包括决策树、基于逻辑的学习等, 后者虽然产生的是“黑箱”模型, 但由于能够有效地解决许多现实问题, 得到了广泛的应用.
 \subsubsection*{20世纪90年代}
 “统计学习”成为了这个年代的主流, 代表技术有支持向机SVM、“核方法”等.而统计学习事实上与连接主义学习关系密切, 支持向量机被普遍接受后, 核技巧(kernel trick)被广泛应用到机器学习各处, 核方法逐渐成为机器学习基本内容.
+
+\vspace{10pt}
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=0.6\textwidth]{SF}
   	\caption{The evolution of the algorithm.\label{fig:SF}}
 \end{figure}
+
+\vspace{-20pt}
 \subsubsection*{21世纪}
 “深度学习”成为了当代的主流, 以往的机器学习技术对使用者要求比较高, 而相比于以往的机器学习技术, 深度学习技术将对于使用者的高要求转移到模型的复杂度上了, 以至于只要下功夫让计算机来调参, 性能往往也不会很坏. 因此, 虽缺乏严格的理论基础, 但它显著降低了机器学习应用者的门槛, 为其走向工程实践带来便利.
 \par \figref{fig:SF} 是机器学习中一些典型算法的发展过程.
@@ -159,18 +163,26 @@ Uber的地图服务团队开发了一个复杂的分段路线系统, 用来预�
 \par 这是为数不多的统计学理论几乎能与机器学习在实战中相媲美, 同时又给出很漂亮理论解释的场景. 但是就在这样的场景下我们也可以看出他们研究风格的巨大区别. 在更多的场合里, 机器学习的前沿发展在一些项目上已经使人类高手相形见绌, 而统计学理论解释机器学习的分支却还处在婴儿阶段. 
 \par 机器学习突破了传统统计学在数学严谨性要求上的枷锁, 本着黑猫白猫抓住了老鼠就是好猫的精神不断地在工程上取得了一个又一个惊人的突破. 同时机器学习也对传统统计学理论的发展提供了新的方向与灵感, 比如研究网络结构的Expressiveness\cite{Yarotsky2017}以及学习过程的Empirical Process\cite{Vapnik1994}的探索等等, 而这些催生出的统计理论在量子物理、数据科学等方向的再次应用也远远超出了机器学习或是人工智能的范畴.
 \section{机器学习基本步骤}
-机器学习虽然是一门具体理论比较复杂的学科, 但其基本步骤却可以高度简单的抽象出来, 下文就简单介绍一下典型的机器学习中的几个步骤.
+机器学习虽然是一门具体理论比较复杂的学科, 但其基本步骤却可以高度简单的抽象出来, 下文就简单介绍一下典型的机器学习中的几个步骤. \figref{fig:buzhou} 是机器学习几个步骤的图示.
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.9\textwidth]{555}
+  	\caption{Procedure of Machine learning.\label{fig:buzhou}}
+\end{figure}
 \subsection{数据获取与预处理}
 所有机器学习算法尽管有各方面的不同, 但大都有一点是相同的——都是数据贪婪的, 即任何一个算法, 都可以通过增加训练数据来达到更好的结果. 因此我们的首要工作便是获得尽可能多的有效的数据. 在获得数据集之后, 进行数据清洗、数据预处理、以及特征选择、降维等工作, 而这些预处理, 特征选择, 降维等工作都是为了模型可以更好地来学习数据.
-\subsection{模型选择}
-在模型中, 一般有三个需要人为选定的参数, 它们是决策函数集、目标函数( 表现度量 )和优化算法.
-\paragraph{决策函数集}即要选定使用什么样的函数集合来构建模型.
+
+同时, 对于原始的数据, 我们还应该将其分割为不同的部分, 一般会分为训练集、测试集与验证集. 训练集主要是用来对于模型进行训练, 测试集用来判断模型的效果, 在模型进入真实环境前改进, 防止模型没有机会通过实际调试就直接应用到实际当中. 当使用了所有的原始数据去训练模型, 得到的结果很可能是该模型最大程度地拟合了原始数据, 对原始数据进行三个数据集的划分, 也是为了防止模型过拟合. 
+\subsection{模型的训练}
+在开始训练模型前, 一般有三或四个需要人为选定的参数, 它们是决策函数集、目标函数( 表现度量 )和优化算法, 有时还有超参数. 
+\paragraph{决策函数集}即要选定使用什么样的决策函数集合来构建模型.
 \paragraph{目标函数( 表现度量 )}即需设定衡量决策函数好坏的度量方法.
 \paragraph{优化算法}即使用什么样的算法根据表现度量来对决策函数中的参数进行优化. 
-\paragraph{超参数调整}超参数是指需要预先给定的一类模型参数, 机器往往不具备学习出这些参数的能力, 如决策树中树的数量或树的深度、学习率、神经网络的隐藏层数、k均值聚类中的簇数等. 一般通过使用验证集进行测试来决定. 
-\subsection{模型的训练与验证}
-\par 在确定好上述参数后, 便需要使用收集好的数据对于模型进行训练. 同时, 为了提高模型的泛化能力, 一般会将收集来的数据划分为$k$组, 分别使用每一组对模型训练然后综合训练结果, 防止模型的过拟合. 
-\par 在得到最终的模型后, 一般需要对它的性能作出评价. 评价模型好坏的方法有很多, 如在分类模型中常用的就有错误率、精准率、召回率、F1指标和ROC等.
+\paragraph{超参数}超参数是指需要预先给定的一类模型参数, 机器往往不具备学习出这些参数的能力, 如决策树中树的数量或树的深度、学习率、神经网络的隐藏层数、k均值聚类中的簇数等. 因此我们先要给定一个超参数的初始值. 在后期的在训练过程中使用验证集进行测试来决定它的最优数值.
+
+在确定好上述参数后, 便需要使用收集好的数据对于模型进行训练. 
+\subsection{模型的验证}
+\par 在得到最终的模型后, 一般需要使用测试集对它的性能作出评价. 评价模型好坏的方法有很多, 如在分类模型中常用的就有错误率、精准率、召回率、F1指标和ROC等.
 \subsection{模型的实际使用}
 \par 使用训练好的模型对于新的数据进行预测.
 \section{机器学习的方法分类}

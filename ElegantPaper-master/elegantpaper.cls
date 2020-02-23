@@ -59,7 +59,7 @@
 
 % define the hyperref color 
 \RequirePackage{xcolor}
-\definecolor{winered}{rgb}{0.5,0,0}
+\definecolor{winered}{rgb}{0,0,0}
 
 % bib-settings
 \RequirePackage{natbib}
@@ -109,7 +109,7 @@
 	\renewcommand\figurename{图} %
 	\renewcommand\tablename{表}%
 	\newcommand\versiontext{\itshape 版本：}%
-	\newcommand\updatetext{\itshape 更新：}%
+	\newcommand\updatetext{\itshape }%
 	\renewcommand\abstractname{摘\hspace{2em}要}
 	\setlength{\parindent}{2em}
 	\renewcommand{\abstracttextfont}{\small\sffamily\kaishu}
