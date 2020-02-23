@@ -4,8 +4,13 @@
 \usepackage{multirow}
 \usepackage{geometry}
 \usepackage{longtable}
+\usepackage{pdfpages}
+\title{First Assignment}
+\author{王成航 张申铎 王泽昊}
 % \usepackage[authoryear]{gbt7714}  % 国标
 \begin{document}
+\includepdf[width=\paperwidth]{FM.pdf}
+\newpage
 \tableofcontents
 \thispagestyle{empty}
 \newpage
@@ -92,11 +97,15 @@
 \par 此时的研究热门都聚集于“从样例中学习”, 包括监督学习, 以及无监督学习. 其中, 以符号主义机器学习和基于神经网络的连接主义机器学习为主流, 前者包括决策树、基于逻辑的学习等, 后者虽然产生的是“黑箱”模型, 但由于能够有效地解决许多现实问题, 得到了广泛的应用.
 \subsubsection*{20世纪90年代}
 “统计学习”成为了这个年代的主流, 代表技术有支持向机SVM、“核方法”等.而统计学习事实上与连接主义学习关系密切, 支持向量机被普遍接受后, 核技巧(kernel trick)被广泛应用到机器学习各处, 核方法逐渐成为机器学习基本内容.
+
+\vspace{10pt}
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=0.6\textwidth]{SF}
   	\caption{The evolution of the algorithm.\label{fig:SF}}
 \end{figure}
+
+\vspace{-20pt}
 \subsubsection*{21世纪}
 “深度学习”成为了当代的主流, 以往的机器学习技术对使用者要求比较高, 而相比于以往的机器学习技术, 深度学习技术将对于使用者的高要求转移到模型的复杂度上了, 以至于只要下功夫让计算机来调参, 性能往往也不会很坏. 因此, 虽缺乏严格的理论基础, 但它显著降低了机器学习应用者的门槛, 为其走向工程实践带来便利.
 \par \figref{fig:SF} 是机器学习中一些典型算法的发展过程.
