@@ -59,7 +59,7 @@
 
 % define the hyperref color 
 \RequirePackage{xcolor}
-\definecolor{winered}{rgb}{0.5,0,0}
+\definecolor{winered}{rgb}{0,0,0}
 
 % bib-settings
 \RequirePackage{natbib}
