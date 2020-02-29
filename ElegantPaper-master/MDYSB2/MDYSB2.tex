@@ -1,0 +1,29 @@
+%!TEX program = xelatex
+% 完整编译方法 1 pdflatex -> bibtex -> pdflatex -> pdflatex
+% 完整编译方法 2: xelatex -> bibtex -> xelatex -> xelatex
+\documentclass[lang=cn,11pt]{elegantpaper}
+
+\title{写他妈的}
+
+
+% 不需要版本信息，直接注释即可
+\version{0.07}
+% 不需要时间信息的话，需要把 \today 删除。
+\date{}
+
+
+% 如果想修改参考文献样式，请把这行注释掉
+% \usepackage[authoryear]{gbt7714}  % 国标
+
+\begin{document}
+
+\maketitle
+
+
+\nocite{*}
+
+% 如果想修改参考文献样式（非国标），请把下行取消注释，并换成合适的样式（比如 unsrt，plain 样式）。
+\bibliographystyle{unsrt}
+\bibliography{wpref}
+
+\end{document}
