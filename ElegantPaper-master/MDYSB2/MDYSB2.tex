@@ -200,18 +200,31 @@ N&=S+E+I+R.
 \end{equation}
 
 \section{结果检验}
-怀着结果不会特别好的预期, 我们选择了几个城市对于结果进行检验. 不幸的是, 结果正好与我们的预期相同. 
-
-首先对于武汉进行了检验, 得到的结果如 \figref{fig:wh}所示, 可以看到, 感染人数峰值约为50000, 达到峰值的时间为开始传播后的第11、12天
+怀着结果不会特别好的预期, 我们随机在验证集中随机抽取了几个城市对于结果进行检验. 不幸的是, 结果正好与我们的预期不谋而合. 
 \begin{figure}[htbp]
   \centering
-  \hspace{25pt}\includegraphics[width=0.6\textwidth]{wh1}
-  \caption{武汉预测结果. \label{fig:wh}}
+  \hspace{25pt}\includegraphics[width=0.6\textwidth]{my}
+  \caption{绵阳预测结果. \label{fig:my}}
+\end{figure}
+第一个验证城市是四川省绵阳市, 得到的结果如 \figref{fig:my} 所示, 可以看到, 感染人数峰值约为30人, 达到峰值的时间为开始传播后的第22、23天, 而到2020.2.28日, 绵阳的实际感染人数只有22人, 预测结果与实际的数据不是十分符合. 
+\begin{figure}[htbp]
+  \centering
+  \hspace{25pt}\includegraphics[width=0.6\textwidth]{dz}
+  \caption{德州预测结果. \label{fig:dz}}
 \end{figure}
 
-\newpage
-%\nocite{*}
+第二个抽取到的验证城市是山东省德州市, 结果如 \figref{fig:dz} 所示, 可以看到, 模型对于德州市的感染人数估计达到了将近60人, 也与实际数据相差甚远, 并且死亡人数也远远高于报道的2人.  
+\begin{figure}[htbp]
+  \centering
+  \hspace{25pt}\includegraphics[width=0.6\textwidth]{nn}
+  \caption{南宁预测结果. \label{fig:nn}}
+\end{figure}
 
+第三个抽取到的城市是广西长族自治区的南宁市, 结果如\figref{fig:nn} 所示, 但实际上南宁市的感染人数在2020.2.28这一天达到了55人. 因此预测值与实际数据仍有较大出入.
+
+经过以上三个城市的抽取检测, 可以初步发现我们所训练出来的模型并不能够准确的预测确诊人数. 实际上, 在验证集的20个城市中进行验证, 误差值达到了0.308347, 可见, 此方法训练出来的模型并不能说它是成功的.
+
+\newpage
 % 如果想修改参考文献样式（非国标）, 请把下行取消注释, 并换成合适的样式（比如 unsrt, plain 样式）. 
 \bibliographystyle{unsrt}
 \bibliography{wpref}
