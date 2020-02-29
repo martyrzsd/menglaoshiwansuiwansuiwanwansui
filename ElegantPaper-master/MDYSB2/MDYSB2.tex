@@ -170,10 +170,10 @@ N&=S+E+I+R.
 	\item 将潜在感染人数设为密切接触人数, 并且对密切接触人数确诊人数作出线性假设, 以估计各个城市各个时间的潜在感染人数, 依照2月28日公布的658587为基准成比例计算出所有城市$t$时刻的潜在感染人数, 对于一个城市再由这个感染人数按比例推算出$t$时刻之前的所有感染人数. 
 \end{enumerate}
 
-将所有城市的所有时刻的数据随机分为80\%训练数据与20\%测试数据. 再在训练数据中的分出10\%的验证数据. 性能度量设为Absolute mean error(因为我们还是觉得这样的表示应该是相对稀疏的), 优化算法设为随机梯度下降, 学习率0.03, 每层网络十个tanh单元, 一共两层全连接, 最后一个输出单元.
+将所有城市的随机分为80\%训练数据与20\%测试数据, 每一个样本包括这个城市在66天(t时刻)的$E(t)$的差分$\Delta E_{city}(t)$与其对应的$S,E,R$的值. 再在训练数据中的按城市分出10\%的验证数据. 性能度量设为Absolute mean error(因为我们还是觉得这样的表示应该是相对稀疏的), 优化算法设为随机梯度下降, 学习率0.03, 每层网络十个tanh单元, 一共两层全连接, 最后一个输出单元.
 
 \begin{equation}
-	\min_{\mathcal N} \dfrac{1}{232*48}\Delta \sum_{\text{all 232 cities, 48 days}}\Big|E_{city}(t)-\mathcal N(S_{city}(t),E_{city}(t),R_{city}(t))\Big|
+	\min_{\mathcal N} \dfrac{1}{232*66}\Delta \sum_{\text{all 232 cities, 66 days}}\Big|E_{city}(t)-\mathcal N(S_{city}(t),E_{city}(t),R_{city}(t))\Big|
 \end{equation}
 
 
