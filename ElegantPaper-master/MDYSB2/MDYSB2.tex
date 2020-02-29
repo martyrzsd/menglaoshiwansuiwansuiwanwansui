@@ -175,7 +175,7 @@ N&=S+E+I+R.
 将所有城市的随机分为80\%训练数据与20\%测试数据, 每一个样本包括这个城市在66天(t时刻)的$E(t)$的差分$\Delta E_{city}(t)$与其对应的$S,E,R$的值. 再在训练数据中的按城市分出10\%的验证数据. 性能度量设为Absolute mean error(因为我们还是觉得这样的表示应该是相对稀疏的), 优化算法设为随机梯度下降, 学习率0.03, 每层网络9个tanh单元, 一共两层全连接, 最后一个输出单元.
 
 \begin{equation}
-	\min_{\mathcal N} \dfrac{1}{232*66}\Delta \sum_{\text{all 232 cities, 66 days}}\Big|E_{city}(t)-\mathcal N(S_{city}(t),E_{city}(t),R_{city}(t))\Big|
+	\min_{\mathcal N} \dfrac{1}{182*66}\Delta \sum_{\text{all 182 cities on 66 days}}\Big|E_{city}(t)-\mathcal N(S_{city}(t),E_{city}(t),R_{city}(t))\Big|
 \end{equation}
 
 
