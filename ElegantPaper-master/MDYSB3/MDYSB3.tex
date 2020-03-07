@@ -124,29 +124,63 @@ Yann Lecun等人于1989年提出基于梯度学习的卷积神经网络算法[1]
 
 我们调用了Keras的preprocess.image类里的ImageDataGenerator来完成这项工作.
 
-整个数据集被分成了20个batch, 每一个batch有100个样本.
+整个数据集被分成了20个batch, 每一个batch有100个样本. 
 
 \subsection{第一次试验结果}
 
 
 \subsection{改进实验细节}
 
-因为算力的短板, 我们另寻他路. 希望能够尽量提高在这样的算力能够允许自由实验的前提下达到最好的结果. 我们从第一次试验的结果里可以发现我们的问题主要是算力能够驱动的数据量太小导致了过拟合. 于是我们便引入了数据增强与预训练模型VGG19来进行改进, 在引入模型后对VGG19的最后段的卷积进行了解锁训练, 进一步地提升了性能. 我们同时还测试了VGG16的性能, 甚至发现试验初期在1080Ti上的训练表现优于
+因为算力的短板, 我们另寻他路. 希望能够尽量提高在这样的算力能够允许自由实验的前提下达到最好的结果. 我们从第一次试验的结果里可以发现我们的问题主要是算力能够驱动的数据量太小导致了过拟合. 于是我们便引入了数据增强与预训练模型VGG19来进行改进. 并且我们在试验后期又加入了两块新的GPU, 使得我们能够从容地对VGG19的最后段的卷积进行解锁训练, 进一步地提升了性能. 同时我们又测试了VGG16的性能, 发现VGG19比VGG16的表现强大约1\%. 
 
 
-\subsubsection{引入预训练VGG16与VGG19}
+
 
 
 
 
 \subsubsection{数据增强避免过拟合}
-由于我们的限制, 能够调用的学习样本并不算多, 可能会出现过拟合的情况, 所以我们采用数据增强的方法, 利用多种能够生成可信图像的随机变换来增加样本, 增强泛化能力.  在Keras中, 可以利用ImageDataGenerator读取的图像进行多次随机变化, 其中的随机变换由多个参数控制, 如角度、缩放的范围、平移范围等, 从而生成更多的样本达到抗过拟合的效果.
+由于我们的限制, 能够调用的学习样本并不算多，可能会出现过拟合的情况，所以我们采用数据增强的方法，利用多种能够生成可信图像的随机变换来增加样本，增强泛化能力。 在Keras中，可以利用ImageDataGenerator读取的图像进行多次随机变化，其中的随机变换由多个参数控制，如角度、缩放的范围、平移范围等, 从而生成更多的样本达到抗过拟合的效果.\figref{fig:augcat}
 
 \begin{figure}[hbtp]
 \centering
   \includegraphics{aug.png}
   \caption{通过随机数据增强生成的猫图像\label{fig:augcat}}
 \end{figure}
+
+在数据增强的变换参数设置为, 随机40度的旋转角, 随机20\%的平移, 随机20\%的放大缩小, 随机20\%的斜向拉伸并允许翻转的条件下, 损失函数为交叉熵, 优化算法为RMSprop, 学习率为1e-5, 我们的训练结果如下
+
+\begin{figure}[hbt]
+\centering
+  \includegraphics[width=0.45\textwidth]{small_aug_1.png}
+  \includegraphics[width=0.45\textwidth]{small_aug_2.png}
+  \caption{带有数据增强的网络训练结果}
+\end{figure}
+
+最后实现了在测试集上81.8\%的准确率. 表现不错但是依然不尽如人意.
+
+
+\subsubsection{引入预训练模型VGG19}
+
+我们在VGG预训练特征提取网络后面加上了两层全联接网络, 在我们的训练集上进行了训练. 损失函数为交叉熵, 优化算法为RMSprop, 学习率为1e-5
+
+\subsubsection{VGG19后端解锁}
+
+由于卷积神经网络卷积部分的特征提取功能从前段到后段有着逐渐抽象的特性. 前段负责物体的纹理边缘等低阶特征提取而后段负责对如位置关系这样的高阶抽象特征的提取, 我们可以期望对于我们这样一个阿猫阿狗数据集的低阶特征与其他数据集无异, 猫的边缘跟车的边缘, 猫的体表纹理跟狗的体表纹理不存在质的差距. 让猫是猫的不是猫这里有一条显著的边缘, 而是猫的这些边缘之间的关系. 所以对于在更大数据集上训练出来VGG19网络的前端的低阶特征提取的卷积, 我们可以认为它有着较好的泛化性. 但是对于后端的网络, 我们希望它的卷积在高阶特征上能够更多地去提取对猫狗分类这样一个问题有效的高阶特征. 于是我们解锁了后VGG19网络里的第五个卷积块的后四层卷积, 一层大约2,359,808个参数, 在我们的训练集上进行了训练. 并且为了避免过拟合, 我们还在网络训练过程中加入了Dropout.
+
+
+%\begin{figure}[hbt]
+%\centering
+%  \includegraphics[width=0.45\textwidth]{}
+%   \includegraphics[width=0.45\textwidth]{}
+%  \caption{}
+%\end{figure}
+
+从图上可以看出因为我们的训练集在有了数据增强以后依然太小, 所以在训练VGG19的后端卷积层时依然出现了过拟合的现象
+
+最后在测试集上达到了喜人的93.3\%的准确率.
+
+
 
 
 
@@ -160,12 +194,79 @@ Yann Lecun等人于1989年提出基于梯度学习的卷积神经网络算法[1]
 
 \subsection{可视化中间输出}
 
+我们对我们的简单模型所得到的卷积层进行了正向传播, 并在中间的每一步, 希望能够获得图像在经过这些滤波器作用后的输出. 我们调用了Keras的Model类来对我们的模型进行分步的实例化实现这一操作.
+
+\begin{figure}[hbtp]
+\centering
+  \includegraphics[width=0.5\textwidth]{a.jpg} \\
+  \includegraphics[width=0.30\textwidth]{30.png}
+  \includegraphics[width=0.30\textwidth]{25}
+  \includegraphics[width=0.30\textwidth]{15}
+  \caption{猫的原本图像与第一卷积层中各滤波器的提取结果的对比, 左为第30个滤波器, 中为第25个滤波器, 右为第15个滤波器}
+\end{figure}
+
+通过对比其这一层所有滤波器的结构我们发现所有的滤波器都应该学习到了不同的特征. 我们还对后面的所有卷积层与池化层都进行了这样的可视化, 希望能够了解机器是如何理解从低阶到高阶的特征的.\figref{fig:forward1}
+
+\begin{figure}[hbtp]
+\centering
+  \includegraphics[width=0.75\textwidth]{conv2d_5.png}\\
+  \includegraphics[width=0.75\textwidth]{max_pooling2d_5}\\
+  \includegraphics[width=0.75\textwidth]{conv2d_6}\\
+  \includegraphics[width=0.75\textwidth]{max_pooling2d_6}\\
+  \includegraphics[width=0.75\textwidth]{conv2d_7}\\
+  \includegraphics[width=0.75\textwidth]{max_pooling2d_7}\\
+  \includegraphics[width=0.75\textwidth]{conv2d_8}\\
+  \includegraphics[width=0.75\textwidth]{max_pooling2d_8}
+  \caption{从第五层到第八层的卷积层与池化层的前向传播可视化\label{fig:forward1}}
+\end{figure}
+
+从\figref{fig:forward1}中可以看出随着卷积层的深入, 滤波器所得到的激活值所可视化出来的图像的可读性在逐渐降低, 浅层的图像还是能看到猫的轮廓与明显的猫的特征, 但是随着网络的深入我们就逐渐无法描述或是理解这些示波器是如何处理这些图像的了.
+
+
+
+
 
 
 
 \subsection{可视化过滤器}
 
-我们希望可视化的是滤波器(卷积部分+ReLu)部分的的功能, 换句话说, 我们希望可视化的是这样的滤波器提取出来的是什么特征. 为了做到这一点, 我们需要知道这样的滤波器$f$在什么样的输入$X$下给出最大的输出值$Y$, 即我们需要在输入空间$\mathcal X$里得到$\arg \max_{X\in \mathcal X} f(X)$.
+我们希望可视化的是滤波器(卷积部分+ReLu)部分的的功能, 换句话说, 我们希望可视化的是这样的滤波器提取出来的是什么特征. 为了做到这一点, 我们需要知道这样的滤波器$f_0$在什么样的输入$X$下给出最大的输出值$Y$, 即我们需要在输入空间$\mathcal X$里得到$\arg \max_{X\in \mathcal X} f_0(X)$. 那么我们如果能引入一个度量使得最大化$f_0(X)$等价于最大化这个度量, 我们就可以在输入空间$\mathcal X$上梯度下降来进行优化. 我们取这个度量为网络输出张量的所有坐标的均值. 从一张带有微弱噪声的灰色的(RBG各值在每个坐标上均为128, 加上了一个从均匀随机的噪声$\sigma\in[0,20]$)的图像开始, 调用了Keras后端的Tensorflow里的随机梯度下降函数来进行实现. 并且在对输入空间即图像更新时, 我们采用了归一化的技巧使得我们的更新能够更加稳定. 在第一次尝试可视化的过程中, 我们的训练过程因数值上溢终止, 于是我们在归一化的同时还给里面加入了一个常数1e-5来避免这样的现象. 通过对五个卷积模块的第一个filter进行了40步的随机梯度下降, 再一次对图像张量进行归一化处理将其颜色坐标转换到[0,1]区间上, 通过调用plt.imshow()函数, 我们终于得到了VGG的filter的第一个可视化图像. 
+
+\begin{figure}[hbtp]
+  \includegraphics{block2_conv1_127.png}
+  \caption{预训练的VGG19网络第二个卷积模块的第一个卷积层的第127个滤波器所在识别的图案可视化图.\label{fig:pretrain-singal}}
+\end{figure}
+
+
+但是当我们尝试讲所有滤波器的图像都进行可视化的时候我们也发现了一些我们没有想到的有趣现象.
+
+\begin{figure}[hbtp]
+\centering
+  \includegraphics[width=0.8\linewidth]{block3_conv1}
+  \caption{预训练的VGG19网络第三个卷积模块的第一个卷积层中的64个滤波器识别的图案的可视化图\label{fig:filter3}}
+\end{figure}
+
+
+
+\begin{figure}[hbtp]
+\centering
+  \includegraphics[width=0.8\linewidth]{block4_conv1}
+  \caption{预训练的VGG19网络第四个卷积模块的第一个卷积层中的64个滤波器所识别的图案可视化图\label{fig:filter4}}
+\end{figure}
+
+\begin{figure}[hbtp]
+\centering
+  \includegraphics[width=0.8\linewidth]{block5_conv1.png}
+  \caption{预训练的VGG19网络第五个卷积模块的第一个卷积层中的64个滤波器识别的图案的可视化图\label{fig:filter5}}
+\end{figure}
+
+通过观察我们可以发现从第三个卷积模块开始\figref{fig:filter3}, 我们的滤波器所识别的图像可视化出来的结果出现了完全是噪声的图像. 并且随着卷积网络的深入, 这样的全部是噪声的图像的数目在不断增加\figref{fig:filter4}, 到了第五个卷积模块\figref{fig:filter5}, 一半的滤波器可视化出来都是与初始噪声相同的模样. 换句话说有可能这些滤波器在输入空间中没有作用, 这个时候随着网络的深入它所探测的特征已经超出了我们的人眼能够分辨的明显的特征, 又或者是随机梯度下降无法很好的还原这些高阶的巨大的卷积块的偏好? 我们无法给出这样的现象的解释.
+
+%\begin{equation}
+%	\begin{aligned}
+%		x = \arg \min \text{mean}(f_0(X))
+%	\end{aligned}
+%\end{equation}
 
 
 
