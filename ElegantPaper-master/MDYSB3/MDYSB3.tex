@@ -8,7 +8,7 @@
 \usepackage{geometry}
 \usepackage{longtable}
 \usepackage{pdfpages}
-\title{基于神经网络和迁移学习的图像识别模型}
+\title{基于卷积神经网络和迁移学习的图像识别模型}
 
 % 不需要版本信息, 直接注释即可
 % \version{0.07}
@@ -20,8 +20,13 @@
 % \usepackage[authoryear]{gbt7714}  % 国标
 
 \begin{document}
+\includepdf[width=\paperwidth]{FM.pdf}
+\newpage
+\maketitle
+
+\vspace{-25pt}
 \begin{abstract}
-	本文首先介绍了CNN的网络结构, 紧接着自建了一个小型神经网络并使用小样本训练集(2000张图片)进行了训练, 在测试集(500张图片)上得到了$73.4\%$的正确率; 对测试集中的数据使用了数据增强(data augmentation)后对神经网络重新进行训练, 在同样的测试集上得到了$82.3\%$的正确率. 之后, 考虑到自建的网络存在深度不够的可能性, 通过从VGG19模型中进行迁移学习, 最终在测试集上得到了$94.3\%$的正确率. 最后, 对于小型网络的特征图输出和VGG19模型的Filter进行了可视化. 
+	本文首先介绍了CNN的网络结构, 紧接着自建了一个小型神经网络并使用小样本训练集(2000张图片)进行了训练, 在测试集(500张图片)上得到了$73.3\%$的正确率; 对测试集中的数据使用了数据增强(data augmentation)后对神经网络重新进行训练, 在同样的测试集上得到了$81.8\%$的正确率. 之后, 考虑到自建的网络存在深度不够的可能性, 通过从VGG19模型中进行迁移学习, 最终在测试集上得到了$94.1\%$的正确率. 最后, 对于小型网络的中间输出和VGG19模型的Filter进行了可视化. 
 \end{abstract}
 \keywords{CNN\ \ 图像识别\ \ 迁移学习\ \ VGG\ \ 可视化}
 	
@@ -32,11 +37,10 @@
 \pagenumbering{arabic}
 
 
-
 \section{前言}
 卷积神经网络是一类包含卷积计算且具有深度结构的前馈神经网络, 它是是深度学习的代表算法之一, 并且近年来在图像处理方面发挥着越来越大的作用. 
 
-Yann Lecun等人于1989年提出基于梯度学习的卷积神经网络算法[1], 并且成功地将其应用在手写数字字符识别, 并在当时的技术和硬件条件就能取得低于1\%的错误率. 2012年, 在计算机视觉“世界杯”之称的ImageNet图像分类竞赛中, Geoffery E.Hinton等人凭借卷积神经网络Alex-Net以超过第二名近12\%的准确率一举夺得该竞赛冠军. 此后, 每年的ImageNet竞赛的冠军非卷积神经网络莫属. 直到2015年, 卷积神经网络在ImageNet数据集上的识别错误率 (4.94\%) 第一次低于人类的预测错误率 (5.1\%). 近年来, 随着卷积神经网络相关领域研究人员的增多, 技术的日新月异, 卷积神经网络也变得愈来愈复杂. 从最初的5层, 16层, 到诸如MSRA提出的152层ResNet甚至上千层网络. 
+Yann Lecun等人于1989年提出基于梯度学习的卷积神经网络算法, 并且成功地将其应用在手写数字字符识别, 并在当时的技术和硬件条件就能取得低于1\%的错误率. 2012年, 在计算机视觉“世界杯”之称的ImageNet图像分类竞赛中, Geoffery E.Hinton等人凭借卷积神经网络Alex-Net以超过第二名近12\%的准确率一举夺得该竞赛冠军. 此后, 每年的ImageNet竞赛的冠军非卷积神经网络莫属. 直到2015年, 卷积神经网络在ImageNet数据集上的识别错误率 (4.94\%) 第一次低于人类的预测错误率 (5.1\%). 近年来, 随着卷积神经网络相关领域研究人员的增多, 技术的日新月异, 卷积神经网络也变得愈来愈复杂. 从最初的5层, 16层, 到诸如MSRA提出的152层ResNet甚至上千层网络. 
 
 因此, 基于CNN在图像识别中已取得的辉煌成就, 我们在各种书籍和课堂的启发下, 使用Keras实现猫狗的图像识别与分类. 
 
@@ -51,37 +55,36 @@ Yann Lecun等人于1989年提出基于梯度学习的卷积神经网络算法[1]
 	\item 产生分类器, 进行预测识别.
 \end{enumerate}
 \subsection{CNN网络}
-首先来介绍CNN网络的基本结构, 对于图像分类问题, 一般来说CNN包括卷积层、池化层、全连接层等. 
+首先介绍CNN网络的基本结构, 对于图像分类问题, 一般来说CNN包括卷积层、池化层、全连接层等. 
 \subsubsection*{卷积层}
-假定一个尺寸为$6\times 6$的图像, 其每一个像素点都储存着图像的信息, 那就可以定义一个卷积核, 来从图片中提取一定的特征. 但机器一开始是无法确定要识别的部分具有哪些特征, 所以会通过不同的卷积核相作用得到的输出值. 一般卷积层越高, 其输出越能表现图片的特征. 
-
-以要分辨的猫举例, 第一层卷积层能学习较小的局部模式 (比如猫耳的边缘、瞳孔等) , 第二层卷积层由第一层特征组成更大的模式 (耳朵、眼睛、鼻子) , 以此类推, 形成最终的抽象概念“猫”, 如 \figref{fig:cat1}. 
 \tiny
 \begin{figure}[htbp]
 	\centering
   \includegraphics[width=0.6\textwidth]{cat1}
-  \caption{视觉世界形成了视觉模块的空间层次结构：比如猫的超局部的边缘组成局部的对象, 比如眼镜或耳朵, 这些局部对象又组合成高级概念“猫”.\label{fig:cat1}}
+  \caption{视觉世界形成了视觉模块的空间层次结构：超局部的边缘组成局部的对象, 如眼睛和耳朵, 局部对象又组合成高级概念“猫”.\label{fig:cat1}}
 \end{figure}
 
 \normalsize
+假定一个尺寸为$6\times 6$的图像, 其每一个像素点都储存着图像的信息, 那就可以定义一个卷积核, 来从图片中提取一定的特征. 但机器一开始是无法确定要识别的部分具有哪些特征, 所以会通过不同的卷积核相作用得到的输出值. 一般卷积层越高, 其输出越能表现图片的特征. 
+
+以要分辨的猫举例, 第一层卷积层能学习较小的局部模式 (比如猫耳的边缘、瞳孔等) , 第二层卷积层由第一层特征组成更大的模式 (耳朵、眼睛、鼻子) , 以此类推, 形成最终的抽象概念“猫”, 如 \figref{fig:cat1}. 
 卷积的工作原理是在图像上滑动一个$3\times 3$的窗口, 它在每个位置停止并提取该位置的所有像素点, 构成一个多维矩阵. 然后将其同一个权重矩阵 (卷积核) 做张量积, 转化为以为一维的向量. 然后将这些向量组合起来转换为多维的输出图像. 详细过程如 \figref{fig:conv1} 所示, 本文将使用Keras的Conv2D来完成这一工作. 
-\begin{figure}[hbtp]
+\begin{figure}[htbp]
 	\centering
   \includegraphics[width=0.5\textwidth]{conv1.png}
   \caption{卷积的工作原理.\label{fig:conv1}}
 \end{figure}
 
 \subsubsection*{池化层}
-池化层的输入就是卷积层输出的原数据与相应的卷积核相乘后的输出矩阵. 池化层的目的是: 
+池化层的输入数据就是卷积层输出的数据与相应的卷积核相作用后得到的输出矩阵. 池化层的目的是
 \begin{enumerate}
 	\item 减少训练参数的数量, 降低卷积层输出数据的维度; 
-	\item 减小过拟合现象, 只保留最有用的图片信息, 减少噪声的传递; 
+	\item 减小过拟合现象, 只保留最有用的图片信息, 减少噪声的传递.
 \end{enumerate}
-
-本文使用的是MaxPooling2D从输入的数据中提取最大值, 然后输出. 
+本文中使用的是MaxPooling2D从输入的数据中对局部取最大值, 然后输出. 
 \subsubsection*{全连接层}
 全连接层的每一个结点都与上一层的所有结点相连, 它起着将已经提取到的特征综合起来的作用. 而全连接层和卷积层的根本区别在于全连接层从输入特征空间中学到的是全局模式, 卷积层学到的是局部模式. 卷积层和池化层的工作就是提取特征, 减少原始图像带来的参数. 在本文中, 为了生成最终的输出, 需要应用全连接层来生成分类器. 全连接层的存在大大减少特征位置对分类的影响. 
-\begin{figure}[hbtp]
+\begin{figure}[htbp]
 \centering
   \includegraphics[width=0.7\textwidth]{densecat.png}
   \tiny
@@ -91,16 +94,23 @@ Yann Lecun等人于1989年提出基于梯度学习的卷积神经网络算法[1]
 \subsection{VGG模型}
 在文章的第二部分, 使用了预训练的VGG19模型来进行迁移学习. 
 
-
+VGG是由Karen Simonyan和Andrew Zisserman在2014年开发, ImageNet的识别, 它是一种简单而广泛使用的卷积神经网络. VGG目前有两种架构, 即VGG16与VGG19, 它们没有本质区别, 只是网络深度不同. VGG16相比AlexNet的一个改进是采用连续的几个3x3的卷积核代替AlexNet中的较大卷积核. VGG的结构非常简洁, 整个网络都使用了同样大小的卷积核尺寸 (3x3) 和最大池化尺寸 (2x2), \figref{fig:vgg} 是其结构的示意图. 
+\begin{figure}[htbp]
+	\centering
+	  \includegraphics[width=0.80\textwidth]{VGG}
+	  \tiny
+	  \caption{VGG示意图.\label{fig:vgg}}
+\end{figure}
 \subsection{网络构建}
 
 首先, 我们自建了一个小型的卷积神经网络, 并对其进行训练, 其网络结构如 \figref{fig:cnn1} 所示. 
-\begin{figure}[hbtp]
+\begin{figure}[htbp]
 	\centering
 	  \includegraphics[width=0.85\textwidth]{cnn1.png}
 	  \tiny
 	  \caption{小型CNN结构示意.\label{fig:cnn1}}
 \end{figure}
+
 \normalsize
 此CNN由Conv2D (使用relu激活) 和MaxPooling2D层交替堆叠构成. 这里我们使用4个Conv2D + MaxPooling的组合来增大网络容量, 也进一步减小特征图的尺寸, 使其在连接层Flatten层时尺寸不会太大. 由于我们面对的是一个二分类问题, 所以网络的最后一层是使用sigmoid激活的单一单元, 使用二元交叉熵作为损失函数. 
 
@@ -108,7 +118,7 @@ Yann Lecun等人于1989年提出基于梯度学习的卷积神经网络算法[1]
 
 \section{模型的训练}
 
-我们在多次尝试配置一台高端机器因各个架构之间的兼容性不同导致失败后, 最后选用了一台装备了i7-8700K与单卡GTX1080Ti的机器(keras 2.2.4, tensorflow 1.4.1)来进行我们简单模型的实验. 因为我们在算力上的短板, 使得我们的模型在全数据上的训练时间过长, 我们不得不在实验的数据量与网络大小上妥协. 但是在这个基础上我们对模型进行了的几次改进, 依旧取得了不错的成果. 
+在多次尝试使用配置机器失败后, 我们选用了一台配备了i7-8700K与单卡GTX1080Ti的机器(keras 2.2.4, tensorflow 1.4.1)上进行了我们简单模型的模型训练. 因为在算力上的短板, 使得我们的模型在全数据上的训练时间过长, 因此, 不得不在训练的数据量与网络大小上妥协. 但是在此基础上我们对模型进行了的几次改进, 依旧取得了不错的成果. 
 
 \subsection{数据收集与处理}
 本文使用Kaggle上的猫狗分类数据集, 这个数据集(training的部分)包含25000张猫狗图像 (两个类别都有12500张) . 我们将其两类分别随机分出了1000张作为训练集, 各500张作为验证集 500张作为测试集数目.
@@ -121,182 +131,148 @@ Yann Lecun等人于1989年提出基于梯度学习的卷积神经网络算法[1]
 	\item 将这些像素网格转换为浮点数张量
 	\item 将像素值 (0-255) 缩放到[0,1]区间
 \end{enumerate}
+我们调用了Keras的preprocess.image类里的ImageDataGenerator来完成这项工作. 同时, 整个数据集被分成了20个batch, 每一个batch有100个样本. 
 
-我们调用了Keras的preprocess.image类里的ImageDataGenerator来完成这项工作.
-
-整个数据集被分成了20个batch, 每一个batch有100个样本, 并且图像样本被转化成了一个大小为(3,150,150)的三维张量.
-
-\subsection{第一次试验结果}
-
-由于这是一个典型的二分类问题, 我们采用了交叉熵作为性能度量, 优化算法为RMSprop, 学习率为1e-5. 网络架构如\figref{fig:small_network}所示
-
-\begin{figure}[hbt]
-  \includegraphics[width=0.8\textwidth]{small_network.jpg}
-  \caption{我们的模型示意图\label{fig:small_network}}
+\subsection{自建CNN训练}
+首先, 我们对于自建的神经网络在数据及上进行了训练, 损失函数为交叉熵, 优化算法为RMSprop, 学习率为1e-4, 得到的结果为
+\begin{figure}[htbp]
+	\centering
+	  \includegraphics[width=0.45\textwidth]{small_without_aug_1}
+	  \includegraphics[width=0.45\textwidth]{small_without_aug_2}
+	  \caption{自建网络训练结果.}
 \end{figure}
 
-其卷积层池化层共有4组, 其中池化均选取了$2\times 2$的池化核大小, 卷积层均选取了$3\times 3$的卷积核, 并且层数中的卷积核数量分别为32,64,128,128. 后面链接了一个512个单元的Relu全联接网络做分类, 最后以一个Sigmoid函数来进行输出. 最后我们的训练结果如下
+此模型的准确度约为73.3\%, 并不是十分的高, 由于网络并不是很大, 训练速度也十分的快. 
+\subsection{改进模型细节}
 
-\begin{figure}[hbt]
-  \includegraphics[width=0.45\textwidth]{small_without_aug_1.png}
-  \includegraphics[width=0.45\textwidth]{small_without_aug_2}
-  \caption{四层卷积四层池化层做特征提取, 一层全联接神经网络做分类的训练结果.}
-\end{figure}
-
-最终在测试集上取得了73.4\%的正确率. 这样的表现难以令人满意, 由于我们的训练结果表明我们在训练集上已经得到了很好的拟合(98\%以上), 于是必然是出现了在训练集上的过拟合. 但是由于我们的算力限制我们并没有办法真的加入太多的样本. 实验的过程中我们的代码不断的报错, 有时不报错但是结果出来根本没有在训练, 这些问题使得一旦我们通过加入数据去来防治过拟合, 我们很可能无法完成这次作业. 于是我们另辟蹊径希望通过其他的一些手段看能不能有所改进.
-
-
-
-
-\subsection{改进实验细节}
-
-因为算力的短板, 我们另寻他路. 希望能够尽量提高在这样的算力能够允许自由实验的前提下达到最好的结果. 我们从第一次试验的结果里可以发现我们的问题主要是算力能够驱动的数据量太小导致了过拟合. 于是我们便引入了数据增强与预训练模型VGG19来进行改进. 并且我们在试验后期开始可视化试验的时候实在没办法, 因计算量过大, 我们又花了一些时间, 配置并加入了两块新的GPU, 获得了接近三倍于我们的初始算力的条件. 这样庞大的算力使得我们能够从容地对VGG19的最后段的卷积进行解锁训练, 进一步改善了模型的性能. 同时我们又测试了VGG16的性能, 发现VGG19比VGG16的表现强大约1\%. 
-
-
-
+因为算力的短板, 我们另寻他路. 希望能够尽量提高在这样的算力所允许自由实验的前提下达到最好的结果. 我们从第一次试验的结果里可以发现我们的问题主要是算力能够驱动的数据量太小导致了过拟合. 于是我们便引入了数据增强与预训练模型VGG19来进行改进. 并且我们在试验后期又加入了两块新的GPU, 使得我们能够从容地对VGG19的最后段的卷积进行解锁训练, 进一步地提升了性能. 同时我们又测试了VGG16的性能, 发现VGG19比VGG16的表现强大约1\%. 
+\begin{figure}[htbp]
+	\centering
+	  \includegraphics{aug.png}
+	  \caption{通过随机数据增强生成的猫图像\label{fig:augcat}}
+	\end{figure}
 \subsubsection{数据增强避免过拟合}
-一开始由于算力的限制, 能够调用的学习样本并不算多，可能会出现过拟合的情况，我们第一次采用了数据增强的方法，利用多种能够生成可信图像的随机变换来增加样本，增强泛化能力。 在Keras中，可以利用ImageDataGenerator读取的图像进行多次随机变化，其中的随机变换由多个参数控制，如角度、缩放的范围、平移范围等, 从而生成更多的样本达到抗过拟合的效果.\figref{fig:augcat}
 
-\begin{figure}[hbtp]
-\centering
-  \includegraphics{aug.png}
-  \caption{通过随机数据增强生成的猫图像\label{fig:augcat}}
-\end{figure}
+由于我们的限制, 能够调用的学习样本并不算多, 可能会出现过拟合的情况, 所以我们采用数据增强的方法, 利用多种能够生成可信图像的随机变换来增加样本, 增强泛化能力.  在Keras中, 可以利用ImageDataGenerator读取的图像进行多次随机变化, 其中的随机变换由多个参数控制, 如角度、缩放的范围、平移范围等, 从而生成更多的样本达到抗过拟合的效果, 如 \figref{fig:augcat}.
 
-在数据增强的变换参数设置为, 随机40度的旋转角, 随机20\%的平移, 随机20\%的放大缩小, 随机20\%的斜向拉伸并允许翻转的条件下, 损失函数为交叉熵, 优化算法为RMSprop, 学习率为1e-5, 我们的训练结果如下
+其中, 数据增强的变换参数设置为, 随机40度的旋转角, 随机20\%的平移, 随机20\%的放大缩小, 随机20\%的斜向拉伸并允许翻转的条件下, 损失函数为交叉熵, 优化算法为RMSprop, 学习率为1e-5, 此次改进后, 训练结果如下
+\begin{figure}[htbp]
+	\centering
+	  \includegraphics[width=0.45\textwidth]{small_aug_1.png}
+	  \includegraphics[width=0.45\textwidth]{small_aug_2.png}
+	  \caption{数据增强后的训练结果.}
+	\end{figure}
 
-\begin{figure}[hbt]
-\centering
-  \includegraphics[width=0.45\textwidth]{small_aug_1.png}
-  \includegraphics[width=0.45\textwidth]{small_aug_2.png}
-  \caption{带有数据增强的网络训练结果}
-\end{figure}
-
-最后实现了在测试集上81.8\%的准确率. 表现不错但是依然不尽如人意.
-
+此模型实现了在测试集上81.8\%的准确率. 表现不错但是依然不尽如人意.
 
 \subsubsection{引入预训练模型VGG19}
+由于自建的网络深度不够可能是准确率不高的主要原因, 我们考虑使用VGG19与训练模型来进行迁移学习. 
 
-为了进一步提高我们的准确率，这里引入预训练网络VGG，VGG由Karen Simonyan和Andrew Zisserman在2014年开发，对于ImageNet，它是一种简单而广泛使用的卷积神经网络。VGG有两种架构，VGG16和VGG19没有本质区别，只是网络深度不同。VGG16相比AlexNet的一个改进是采用连续的几个$3\times 3$的卷积核代替AlexNet中的较大卷积核。对于给定的感受野，采用堆积的小卷积核是优于采用大的卷积核，因为多层非线性层可以增加网络深度来保证学习更复杂的模式，而且代价还比较小。VGG的结构非常简洁，整个网络都使用了同样大小的卷积核尺寸$(3x3)$和最大池化尺寸$(2x2)$，适合作为我们初学者的预训练网络。下面我们使用VGG19进行预训练，VGG的网络结构如下：
+我们在VGG19预训练特征提取网络后面加上了两层全连接网络, 在训练集上进行了训练. 损失函数为交叉熵, 优化算法为RMSprop, 学习率为1e-5, 训练结果如 \figref{fig:ab1}.
+\begin{figure}[htbp]
+	\centering
+	  \includegraphics[width=0.45\textwidth]{VGG_classify_1}
+	  \includegraphics[width=0.45\textwidth]{VGG_classify_2}
+	  \caption{使用VGG19进行简单特征后的训练结果. \label{fig:ab1}}
+	\end{figure}
 
-\VGG的图!!!!!!
-
-%
-%\begin{figure}[hbt]
-%  \includegraphics{}
-%  \caption{}
-%\end{figure}
-%
-
-
-
-我们在VGG19预训练特征提取网络后面加上了两层全联接ReLu网络作为我们的特征筛选网络, 在我们的训练集上进行了训练. 损失函数为交叉熵, 优化算法为RMSprop, 学习率为1e-5
-
+此模型在测试集上的准确率达到了$88.4\%$, 并且还可以像上文一样使用数据增强技术来提高准确率. 
 \subsubsection{VGG19后端解锁}
 
-由于卷积神经网络卷积部分的特征提取功能从前段到后段有着逐渐抽象的特性. 前段负责物体的纹理边缘等低阶特征提取而后段负责对如位置关系这样的高阶抽象特征的提取, 我们可以期望对于我们这样一个阿猫阿狗数据集的低阶特征与其他数据集无异, 猫的边缘跟车的边缘, 猫的体表纹理跟狗的体表纹理不存在质的差距. 让猫是猫的不是猫这里有一条显著的边缘, 而是猫的这些边缘之间的关系. 所以对于在更大数据集上训练出来VGG19网络的前端的低阶特征提取的卷积, 我们可以认为它有着较好的泛化性. 但是对于后端的网络, 我们希望它的卷积在高阶特征上能够更多地去提取对猫狗分类这样一个问题有效的高阶特征. 于是我们解锁了后VGG19网络里的第五个卷积块的后四层卷积, 一层大约2,359,808个参数, 在我们的训练集上进行了训练(训练细节同上). 并且为了避免过拟合, 我们还在网络训练过程中加入了0.2的Dropout.
+卷积神经网络的卷积部分特征提取功能从前段到后段有着逐渐抽象的特性. 前段负责物体的纹理边缘等低阶特征提取而后段负责对如位置关系这样的高阶抽象特征的提取, 因此, 可以认为这样一个阿猫阿狗数据集的低阶特征与其他数据集无异, 如猫的边缘跟车的边缘, 猫的体表纹理跟狗的体表纹理不存在质的差距. 
 
+也就是让猫是猫的那个特征并不是边缘或者斑点, 而是猫的这些边缘或者是斑点之间的关系. 所以对于在更大数据集上训练出来VGG19网络的前端的低阶特征提取的卷积, 我们可以认为它有着较好的泛化性. 但是对于后端的网络, 我们希望它的卷积在高阶特征上能够更多地去提取对猫狗分类这样一个问题有效的高阶特征. 于是我们解锁了后VGG19网络里的第五个卷积块的后四层卷积, 一层大约2,359,808个参数, 在我们的训练集上进行了训练. 并且为了避免过拟合, 还在网络训练过程中加入了Dropout.
+
+训练的结果如 \figref{fig:vggunlock}
 
 \begin{figure}[hbt]
 \centering
-  \includegraphics[width=0.45\textwidth]{VGG_19_unlocked_1}
+ \includegraphics[width=0.45\textwidth]{VGG_19_unlocked_1}
   \includegraphics[width=0.45\textwidth]{VGG_19_unlocked_2}
-  \caption{VGG19网络后端解锁四层卷积层的训练成果}
+ \caption{VGG解锁后的训练结果.\label{fig:vggunlock}}
 \end{figure}
 
-从图上可以看出因为我们的训练集在有了数据增强有了Dropout以后依然太小, 所以在训练VGG19的后端卷积层时还是出现了过拟合的现象. 不过这并不影响结果, 最后在测试集上达到了喜人的93.3\%的准确率.
-
-
-
-
+从图上可以看出因为我们的训练集在有了数据增强以后依然太小, 所以在训练VGG19的后端卷积层时依然出现了过拟合的现象, 最终, 此模型在测试集上达到了喜人的94.1\%的准确率.
 
 \section{可视化}
 
 我们最开始的打算是希望能够可视化整个模型训练过程中的特征图与滤波器的选择的变化, 让keras在自动化训练的每一个epoch的时候输出一次可视化结果. 但是因为这样的操作涉及更改Keras源码, 需要重写keras的训练函数, 在查看了Keras源码以后我们发现这个工作的工作量远远超出了我们的预计. 于是我们选择了一种相对简单但是也相当直观的可视化方式. 在模型训练完毕了以后对于模型的每一层的特征图与滤波器的滤波现象进行可视化.
 
-在可视化VGG16与VGG19的滤波器的过程中, 我们的GTX1080Ti又遇到了算力不足完成一次试验需要太久的问题, 我们不得不再租用一台双卡Titan Xp进行试验, 在速度上得到了超过两倍的提升的同时很好地完成了可视化任务. 并且我们在可视化的过程中也发现了一些有趣的问题与现象.
-
-
+在可视化VGG19的滤波器的过程中, 我们的GTX1080Ti又遇到了算力不足完成一次试验需要太久的问题, 我们不得不再租用一台双卡Titan Xp进行试验, 在速度上得到了超过两倍的提升的同时很好地完成了可视化任务. 并且我们在可视化的过程中也发现了一些有趣的问题与现象.
 
 \subsection{可视化中间输出}
 
-我们对我们的简单模型所得到的卷积层进行了正向传播, 并在中间的每一步, 希望能够获得图像在经过这些滤波器作用后的输出. 我们调用了Keras的Model类来对我们的模型进行分步的实例化实现这一操作.
-
-\begin{figure}[hbtp]
-\centering
-  \includegraphics[width=0.5\textwidth]{a.jpg} \\
-  \includegraphics[width=0.30\textwidth]{30.png}
-  \includegraphics[width=0.30\textwidth]{25}
-  \includegraphics[width=0.30\textwidth]{15}
-  \caption{猫的原本图像与第一卷积层中各滤波器的提取结果的对比, 左为第30个滤波器, 中为第25个滤波器, 右为第15个滤波器}
+我们对自建的简单模型所得到的卷积层进行了正向传播, 并希望在中间的每一步, 能够获得图像在经过这些滤波器作用后的输出. 我们调用了Keras的Model类来对我们的模型进行分步的实例化实现这一操作.\\
+原图为: 
+\begin{figure}[htbp]
+	\centering
+	  \includegraphics[width=0.2\textwidth]{a.jpg}
 \end{figure}
 
-通过对比其这一层所有滤波器的结构我们发现所有的滤波器都应该学习到了不同的特征. 我们还对后面的所有卷积层与池化层都进行了这样的可视化, 希望能够了解机器是如何理解从低阶到高阶的特征的.\figref{fig:forward1}
-
-\begin{figure}[hbtp]
+\noindent 得到的几个中间输出结果为
+\begin{figure}[h]
 \centering
-  \includegraphics[width=0.75\textwidth]{conv2d_5.png}\\
-  \includegraphics[width=0.75\textwidth]{max_pooling2d_5}\\
-  \includegraphics[width=0.75\textwidth]{conv2d_6}\\
-  \includegraphics[width=0.75\textwidth]{max_pooling2d_6}\\
-  \includegraphics[width=0.75\textwidth]{conv2d_7}\\
-  \includegraphics[width=0.75\textwidth]{max_pooling2d_7}\\
-  \includegraphics[width=0.75\textwidth]{conv2d_8}\\
-  \includegraphics[width=0.75\textwidth]{max_pooling2d_8}
-  \caption{从第五层到第八层的卷积层与池化层的前向传播可视化\label{fig:forward1}}
+  \includegraphics[width=0.25\textwidth]{30.png}
+  \includegraphics[width=0.25\textwidth]{25}
+  \includegraphics[width=0.25\textwidth]{15}
+  \caption{左为第30个滤波器, 中为第25个滤波器, 右为第15个滤波器.}
 \end{figure}
 
-从\figref{fig:forward1}中可以看出随着卷积层的深入, 滤波器所得到的激活值所可视化出来的图像的可读性在逐渐降低, 浅层的图像还是能看到猫的轮廓与明显的猫的特征, 但是随着网络的深入我们就逐渐无法描述或是理解这些示波器是如何处理这些图像的了.
+可以看到, 第30个滤波器似乎相应的是皮毛纹理, 而第25个滤波器似乎相应的是眼睛与边缘. 通过对比其这一层所有滤波器的结构我们发现所有的滤波器都应该学习到了不同的特征. 我们还对后面的所有卷积层与池化层都进行了这样的可视化, 希望能够了解机器是如何理解从低阶到高阶的特征的, 下图所示是从第五层到第八层的卷积层与池化层的前向传播可视化. 
+\begin{center}
+\includegraphics[width=0.9\textwidth]{conv2d_5.png}\\
+\includegraphics[width=0.9\textwidth]{max_pooling2d_5}\\
+\includegraphics[width=0.9\textwidth]{conv2d_6}\\
+\includegraphics[width=0.9\textwidth]{max_pooling2d_6}\\
+\includegraphics[width=0.9\textwidth]{conv2d_7}\\
+\includegraphics[width=0.9\textwidth]{max_pooling2d_7}\\
+\includegraphics[width=0.9\textwidth]{conv2d_8}\\
+\includegraphics[width=0.9\textwidth]{max_pooling2d_8}
 
+\end{center}
 
-
-
-
-
+从上图中可以看出随着卷积层的深入, 滤波器所得到的激活值所可视化出来的图像的可读性在逐渐降低, 浅层的图像还是能看到猫的轮廓与明显的猫的特征, 但是随着网络的深入, 输出变得逐渐抽象, 但是大体上可以分为两类,一类是两个明显的亮点, 可能代表猫的眼睛特征, 另一类可能是猫的外表轮廓. 
 
 \subsection{可视化过滤器}
 
-我们希望可视化的是滤波器(卷积部分+ReLu)部分的的功能, 换句话说, 我们希望可视化的是这样的滤波器提取出来的是什么特征. 为了做到这一点, 我们需要知道这样的滤波器$f_0$在什么样的输入$X$下给出最大的输出值$Y$, 即我们需要在输入空间$\mathcal X$里得到$\arg \max_{X\in \mathcal X} f_0(X)$. 那么我们如果能引入一个度量使得最大化$f_0(X)$等价于最大化这个度量, 我们就可以在输入空间$\mathcal X$上梯度下降来进行优化. 我们取这个度量为网络输出张量的所有坐标的均值. 从一张带有微弱噪声的灰色的(RBG各值在每个坐标上均为128, 加上了一个从均匀随机的噪声$\sigma\in[0,20]$)的图像开始, 调用了Keras后端的Tensorflow里的随机梯度下降函数来进行实现. 并且在对输入空间即图像更新时, 我们采用了归一化的技巧使得我们的更新能够更加稳定. 在第一次尝试可视化的过程中, 我们的训练过程因数值上溢终止, 于是我们在归一化的同时还给里面加入了一个常数1e-5来避免这样的现象. 通过对五个卷积模块的第一个filter进行了40步的随机梯度下降, 再一次对图像张量进行归一化处理将其颜色坐标转换到[0,1]区间上, 通过调用plt.imshow()函数, 我们终于得到了VGG的filter的第一个可视化图像. 
+我们希望可视化的是滤波器(卷积部分$+$ReLu)部分的的功能, 换句话说, 我们希望可视化的是这样的滤波器提取出来的是什么特征. 
 
-\begin{figure}[hbtp]
-  \includegraphics{block2_conv1_127.png}
-  \caption{预训练的VGG19网络第二个卷积模块的第一个卷积层的第127个滤波器所在识别的图案可视化图.\label{fig:pretrain-singal}}
+为了做到这一点, 我们需要知道这样的滤波器$f_0$在什么样的输入$X$下给出最大的输出值$Y$, 即我们需要在输入空间$\mathcal X$里得到$\arg \max_{X\in \mathcal X} f_0(X)$. 那么我们如果能引入一个度量使得最大化$f_0(X)$等价于最大化这个度量, 我们就可以在输入空间$\mathcal X$上梯度下降来进行优化. 我们取这个度量为网络输出张量的所有坐标的均值. 从一张带有微弱噪声的灰色的(RBG各值在每个坐标上均为128, 加上了一个从均匀随机的噪声$\sigma\in[0,20]$)的图像开始, 调用了Keras后端的Tensorflow里的随机梯度下降函数来进行实现. 并且在对输入空间即图像更新时, 我们采用了归一化的技巧使得我们的更新能够更加稳定. 在第一次尝试可视化的过程中, 我们的训练过程因数值上溢终止, 于是我们在归一化的同时还给里面加入了一个常数1e-5来避免这样的现象. 
+
+通过对五个卷积模块的第一个filter进行了40步的随机梯度下降, 再一次对图像张量进行归一化处理将其颜色坐标转换到[0,1]区间上, 通过调用plt.imshow()函数, 我们终于得到了VGG的filter的第一个可视化图像, 这个Filter似乎对与斑点图案的响应最大. 
+\begin{figure}[htbp]
+	\centering
+  \hspace{-30pt}\includegraphics[width=0.5\textwidth]{block2_conv1_127.png}
+  \tiny
+  \caption{预训练的VGG19网络第二个卷积模块的第一个卷积层的第128个滤波器所在识别的图案可视化图.\label{fig:pretrain-singal}}
 \end{figure}
 
+\normalsize
+但当我们尝试将所有的滤波器图像都进行可视化的时候我们也发现了一些我们没有想到的有趣现象.
 
-但是当我们尝试讲所有滤波器的图像都进行可视化的时候我们也发现了一些我们没有想到的有趣现象.
-
-\begin{figure}[hbtp]
-\centering
-  \includegraphics[width=0.8\linewidth]{block3_conv1}
-  \caption{预训练的VGG19网络第三个卷积模块的第一个卷积层中的64个滤波器识别的图案的可视化图\label{fig:filter3}}
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\linewidth]
+	{block3_conv1}
+	\caption{预训练的VGG19网络第三个卷积模块的第一个卷积层中的64个滤波器识别的图案的可视化\label{fig:filter3}}
 \end{figure}
-
-
-
-\begin{figure}[hbtp]
-\centering
-  \includegraphics[width=0.8\linewidth]{block4_conv1}
+\begin{figure}
+	\centering
+  \includegraphics[width=0.5\linewidth]{block4_conv1}
   \caption{预训练的VGG19网络第四个卷积模块的第一个卷积层中的64个滤波器所识别的图案可视化图\label{fig:filter4}}
 \end{figure}
-
-\begin{figure}[hbtp]
+\begin{figure}
 \centering
-  \includegraphics[width=0.8\linewidth]{block5_conv1.png}
+  \includegraphics[width=0.5\linewidth]{block5_conv1.png}
   \caption{预训练的VGG19网络第五个卷积模块的第一个卷积层中的64个滤波器识别的图案的可视化图\label{fig:filter5}}
 \end{figure}
 
-通过观察我们可以发现从第三个卷积模块开始\figref{fig:filter3}, 我们的滤波器所识别的图像可视化出来的结果出现了完全是噪声的图像. 并且随着卷积网络的深入, 这样的全部是噪声的图像的数目在不断增加\figref{fig:filter4}, 到了第五个卷积模块\figref{fig:filter5}, 一半的滤波器可视化出来都是与初始噪声相同的模样. 换句话说有可能这些滤波器在输入空间中没有作用, 这个时候随着网络的深入它所探测的特征已经超出了我们的人眼能够分辨的明显的特征, 又或者是随机梯度下降无法很好的还原这些高阶的巨大的卷积块的偏好? 我们无法给出这样的现象的解释.
+通过观察, 我们可以发现从第三个卷积模块开始\figref{fig:filter3}, 我们的滤波器所识别的图像可视化出来的结果出现了完全是噪声的图像. 并且随着卷积网络的深入, 这样的全部是噪声的图像的数目在不断增加\figref{fig:filter4}, 到了第五个卷积模块\figref{fig:filter5}, 一半的滤波器可视化出来都是与初始噪声相同的模样. 换句话说有可能这些滤波器在输入空间中没有作用, 这个时候随着网络的深入它所探测的特征已经超出了我们的人眼能够分辨的明显的特征, 又或者是随机梯度下降无法很好的还原这些高阶的巨大的卷积块的偏好? 我们无法给出这样的现象的解释.
 
-%\begin{equation}
-%	\begin{aligned}
-%		x = \arg \min \text{mean}(f_0(X))
-%	\end{aligned}
-%\end{equation}
+\section{CNN遐想}
+在刚过去的2019年, 技术层面上, 计算机视觉的应用在整个人工智能应用领域中占比达34.9\%, 已然成为各行业发展的重要支撑. 而深度学习在图像识别的任务已经超过人类, 可见卷积神经网络能够很好地从输入映射到隐层地特征表达, 并且能够层级式地提取特征并通过最后通过内嵌的分类网络完成分类任务. 
 
-
-
-
+由于最新的卷积神经网络在某个程度上解决了计算机视觉领域特征表达的问题, CNN开始在诸多研究方向如目标检测, 图像分割, 实例分割, 图像生成, 人脸识别, 车辆识别, 人体姿态估计等大方光彩, 取得的研究成果也是远超传统算法令人振奋. 深度学习或者说CNN通过刷脸支付, 交通天眼系统, 无人驾驶等商业应用正在悄悄的改变着我们的生活. 并且CNN通过轻量化网络或者模型压缩能够在嵌入式或者移动端运行, 已慢慢从实验室走向更多的商业化应用, 走进寻常百姓家. 
 
 \newpage
 \nocite{*}
