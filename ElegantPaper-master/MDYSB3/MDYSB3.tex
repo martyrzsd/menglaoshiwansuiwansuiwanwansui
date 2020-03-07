@@ -166,7 +166,7 @@ VGG是由Karen Simonyan和Andrew Zisserman在2014年开发, ImageNet的识别, �
 \centering
   \includegraphics[width=0.45\textwidth]{small_aug_1.png}
   \includegraphics[width=0.45\textwidth]{small_aug_2.png}
-  \caption{迁移学习训练结果}
+  \caption{数据增强后的训练结果.}
 \end{figure}
 
 实现了在测试集上81.8\%的准确率. 表现不错但是依然不尽如人意.
@@ -174,12 +174,12 @@ VGG是由Karen Simonyan和Andrew Zisserman在2014年开发, ImageNet的识别, �
 \subsubsection{引入预训练模型VGG19}
 由于自建的网络深度不够可能是准确率不高的主要原因, 我们考虑使用VGG19与训练模型来进行迁移学习. 
 
-我们在VGG19预训练特征提取网络后面加上了两层全连接网络, 在训练集上进行了训练. 损失函数为交叉熵, 优化算法为RMSprop, 学习率为1e-5, 训练结果如 \figref{fig:a1}.
+我们在VGG19预训练特征提取网络后面加上了两层全连接网络, 在训练集上进行了训练. 损失函数为交叉熵, 优化算法为RMSprop, 学习率为1e-5, 训练结果如 \figref{fig:ab1}.
 \begin{figure}[htbp]
 	\centering
 	  \includegraphics[width=0.45\textwidth]{VGG_classify_1}
 	  \includegraphics[width=0.45\textwidth]{VGG_classify_2}
-	  \caption{使用VGG19进行简单特征后的训练结果. \ref{fig:a1}}
+	  \caption{使用VGG19进行简单特征后的训练结果. \label{fig:ab1}}
 	\end{figure}
 
 此模型在测试集上的准确率达到了$88.4\%$, 并且还可以像上文一样使用数据增强技术来提高准确率. 
@@ -195,7 +195,7 @@ VGG是由Karen Simonyan和Andrew Zisserman在2014年开发, ImageNet的识别, �
 \centering
  \includegraphics[width=0.45\textwidth]{VGG_19_unlocked_1}
   \includegraphics[width=0.45\textwidth]{VGG_19_unlocked_2}
- \caption{VGG解锁后的训练结果.\ref{fig:vggunlock}}
+ \caption{VGG解锁后的训练结果.\label{fig:vggunlock}}
 \end{figure}
 
 从图上可以看出因为我们的训练集在有了数据增强以后依然太小, 所以在训练VGG19的后端卷积层时依然出现了过拟合的现象, 最终, 此模型在测试集上达到了喜人的94.1\%的准确率.
@@ -214,7 +214,8 @@ VGG是由Karen Simonyan和Andrew Zisserman在2014年开发, ImageNet的识别, �
 	\centering
 	  \includegraphics[width=0.2\textwidth]{a.jpg}
 \end{figure}
-得到的几个中间输出结果为
+
+\noindent 得到的几个中间输出结果为
 \begin{figure}[h]
 \centering
   \includegraphics[width=0.25\textwidth]{30.png}
