@@ -8,7 +8,7 @@
 \usepackage{geometry}
 \usepackage{longtable}
 \usepackage{pdfpages}
-\title{写他妈的}
+\title{基于神经网络和迁移学习的图像识别模型}
 
 % 不需要版本信息, 直接注释即可
 % \version{0.07}
@@ -20,10 +20,11 @@
 % \usepackage[authoryear]{gbt7714}  % 国标
 
 \begin{document}
-
-
-\newpage
-\Large
+\begin{abstract}
+	本文首先介绍了CNN的网络结构, 紧接着自建了一个小型神经网络并使用小样本训练集(2000张图片)进行了训练, 在测试集(500张图片)上得到了$73.4\%$的正确率; 对测试集中的数据使用了数据增强(data augmentation)后对神经网络重新进行训练, 在同样的测试集上得到了$82.3\%$的正确率. 之后, 考虑到自建的网络存在深度不够的可能性, 通过从VGG19模型中进行迁移学习, 最终在测试集上得到了$94.3\%$的正确率. 最后, 对于小型网络的中间激活层输出和VGG19模型的Filter进行了可视化. 
+\end{abstract}
+\keywords{CNN\ \ 图像识别\ \ 迁移学习\ \ 可视化}
+	
 \tableofcontents
 \thispagestyle{empty}
 \newpage
