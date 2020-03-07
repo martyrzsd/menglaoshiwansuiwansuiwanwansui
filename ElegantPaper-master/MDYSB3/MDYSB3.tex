@@ -177,7 +177,19 @@ Yann Lecun等人于1989年提出基于梯度学习的卷积神经网络算法[1]
 
 \subsubsection{引入预训练模型VGG19}
 
-我们在VGG预训练特征提取网络后面加上了两层全联接网络, 在我们的训练集上进行了训练. 损失函数为交叉熵, 优化算法为RMSprop, 学习率为1e-5
+
+\VGG的图!!!!!!
+
+%
+%\begin{figure}[hbt]
+%  \includegraphics{}
+%  \caption{}
+%\end{figure}
+%
+
+
+
+我们在VGG19预训练特征提取网络后面加上了两层全联接ReLu网络作为我们的特征筛选网络, 在我们的训练集上进行了训练. 损失函数为交叉熵, 优化算法为RMSprop, 学习率为1e-5
 
 \subsubsection{VGG19后端解锁}
 
