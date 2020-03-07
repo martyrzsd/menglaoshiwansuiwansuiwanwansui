@@ -8,7 +8,7 @@
 \usepackage{geometry}
 \usepackage{longtable}
 \usepackage{pdfpages}
-\title{基于神经网络和迁移学习的图像识别模型}
+\title{基于卷积神经网络和迁移学习的图像识别模型}
 
 % 不需要版本信息, 直接注释即可
 % \version{0.07}
@@ -22,7 +22,9 @@
 \begin{document}
 \includepdf[width=\paperwidth]{FM.pdf}
 \newpage
-\newpage
+\maketitle
+
+\vspace{-25pt}
 \begin{abstract}
 	本文首先介绍了CNN的网络结构, 紧接着自建了一个小型神经网络并使用小样本训练集(2000张图片)进行了训练, 在测试集(500张图片)上得到了$73.3\%$的正确率; 对测试集中的数据使用了数据增强(data augmentation)后对神经网络重新进行训练, 在同样的测试集上得到了$81.8\%$的正确率. 之后, 考虑到自建的网络存在深度不够的可能性, 通过从VGG19模型中进行迁移学习, 最终在测试集上得到了$94.1\%$的正确率. 最后, 对于小型网络的中间输出和VGG19模型的Filter进行了可视化. 
 \end{abstract}
@@ -33,10 +35,6 @@
 \newpage
 \normalsize
 \pagenumbering{arabic}
-
-
-
-
 
 
 \section{前言}
@@ -57,19 +55,19 @@ Yann Lecun等人于1989年提出基于梯度学习的卷积神经网络算法, �
 	\item 产生分类器, 进行预测识别.
 \end{enumerate}
 \subsection{CNN网络}
-首先来介绍CNN网络的基本结构, 对于图像分类问题, 一般来说CNN包括卷积层、池化层、全连接层等. 
+首先介绍CNN网络的基本结构, 对于图像分类问题, 一般来说CNN包括卷积层、池化层、全连接层等. 
 \subsubsection*{卷积层}
-假定一个尺寸为$6\times 6$的图像, 其每一个像素点都储存着图像的信息, 那就可以定义一个卷积核, 来从图片中提取一定的特征. 但机器一开始是无法确定要识别的部分具有哪些特征, 所以会通过不同的卷积核相作用得到的输出值. 一般卷积层越高, 其输出越能表现图片的特征. 
-
-以要分辨的猫举例, 第一层卷积层能学习较小的局部模式 (比如猫耳的边缘、瞳孔等) , 第二层卷积层由第一层特征组成更大的模式 (耳朵、眼睛、鼻子) , 以此类推, 形成最终的抽象概念“猫”, 如 \figref{fig:cat1}. 
 \tiny
 \begin{figure}[htbp]
 	\centering
   \includegraphics[width=0.6\textwidth]{cat1}
-  \caption{视觉世界形成了视觉模块的空间层次结构：比如猫的超局部的边缘组成局部的对象, 比如眼镜或耳朵, 这些局部对象又组合成高级概念“猫”.\label{fig:cat1}}
+  \caption{视觉世界形成了视觉模块的空间层次结构：超局部的边缘组成局部的对象, 如眼睛和耳朵, 局部对象又组合成高级概念“猫”.\label{fig:cat1}}
 \end{figure}
 
 \normalsize
+假定一个尺寸为$6\times 6$的图像, 其每一个像素点都储存着图像的信息, 那就可以定义一个卷积核, 来从图片中提取一定的特征. 但机器一开始是无法确定要识别的部分具有哪些特征, 所以会通过不同的卷积核相作用得到的输出值. 一般卷积层越高, 其输出越能表现图片的特征. 
+
+以要分辨的猫举例, 第一层卷积层能学习较小的局部模式 (比如猫耳的边缘、瞳孔等) , 第二层卷积层由第一层特征组成更大的模式 (耳朵、眼睛、鼻子) , 以此类推, 形成最终的抽象概念“猫”, 如 \figref{fig:cat1}. 
 卷积的工作原理是在图像上滑动一个$3\times 3$的窗口, 它在每个位置停止并提取该位置的所有像素点, 构成一个多维矩阵. 然后将其同一个权重矩阵 (卷积核) 做张量积, 转化为以为一维的向量. 然后将这些向量组合起来转换为多维的输出图像. 详细过程如 \figref{fig:conv1} 所示, 本文将使用Keras的Conv2D来完成这一工作. 
 \begin{figure}[htbp]
 	\centering
@@ -78,12 +76,12 @@ Yann Lecun等人于1989年提出基于梯度学习的卷积神经网络算法, �
 \end{figure}
 
 \subsubsection*{池化层}
-池化层的输入就是卷积层输出的原数据与相应的卷积核相乘后的输出矩阵. 池化层的目的是: 
+池化层的输入数据就是卷积层输出的数据与相应的卷积核相作用后得到的输出矩阵. 池化层的目的是
 \begin{enumerate}
 	\item 减少训练参数的数量, 降低卷积层输出数据的维度; 
-	\item 减小过拟合现象, 只保留最有用的图片信息, 减少噪声的传递; 
+	\item 减小过拟合现象, 只保留最有用的图片信息, 减少噪声的传递.
 \end{enumerate}
-本文使用的是MaxPooling2D从输入的数据中提取最大值, 然后输出. 
+本文中使用的是MaxPooling2D从输入的数据中对局部取最大值, 然后输出. 
 \subsubsection*{全连接层}
 全连接层的每一个结点都与上一层的所有结点相连, 它起着将已经提取到的特征综合起来的作用. 而全连接层和卷积层的根本区别在于全连接层从输入特征空间中学到的是全局模式, 卷积层学到的是局部模式. 卷积层和池化层的工作就是提取特征, 减少原始图像带来的参数. 在本文中, 为了生成最终的输出, 需要应用全连接层来生成分类器. 全连接层的存在大大减少特征位置对分类的影响. 
 \begin{figure}[htbp]
@@ -99,11 +97,10 @@ Yann Lecun等人于1989年提出基于梯度学习的卷积神经网络算法, �
 VGG是由Karen Simonyan和Andrew Zisserman在2014年开发, ImageNet的识别, 它是一种简单而广泛使用的卷积神经网络. VGG目前有两种架构, 即VGG16与VGG19, 它们没有本质区别, 只是网络深度不同. VGG16相比AlexNet的一个改进是采用连续的几个3x3的卷积核代替AlexNet中的较大卷积核. VGG的结构非常简洁, 整个网络都使用了同样大小的卷积核尺寸 (3x3) 和最大池化尺寸 (2x2), \figref{fig:vgg} 是其结构的示意图. 
 \begin{figure}[htbp]
 	\centering
-	  \includegraphics[width=0.85\textwidth]{VGG}
+	  \includegraphics[width=0.80\textwidth]{VGG}
 	  \tiny
 	  \caption{VGG示意图.\label{fig:vgg}}
 \end{figure}
-
 \subsection{网络构建}
 
 首先, 我们自建了一个小型的卷积神经网络, 并对其进行训练, 其网络结构如 \figref{fig:cnn1} 所示. 
@@ -121,7 +118,7 @@ VGG是由Karen Simonyan和Andrew Zisserman在2014年开发, ImageNet的识别, �
 
 \section{模型的训练}
 
-在多次尝试使用配置机器失败后, 我们选用了一台配备了i7-8700K与单卡GTX1080Ti的机器(keras 2.2.4, tensorflow 1.4.1)上进行了我们简单模型的实验. 因为在算力上的短板, 使得我们的模型在全数据上的训练时间过长, 因此, 不得不在实验的数据量与网络大小上妥协. 但是在此基础上我们对模型进行了的几次改进, 依旧取得了不错的成果. 
+在多次尝试使用配置机器失败后, 我们选用了一台配备了i7-8700K与单卡GTX1080Ti的机器(keras 2.2.4, tensorflow 1.4.1)上进行了我们简单模型的模型训练. 因为在算力上的短板, 使得我们的模型在全数据上的训练时间过长, 因此, 不得不在训练的数据量与网络大小上妥协. 但是在此基础上我们对模型进行了的几次改进, 依旧取得了不错的成果. 
 
 \subsection{数据收集与处理}
 本文使用Kaggle上的猫狗分类数据集, 这个数据集(training的部分)包含25000张猫狗图像 (两个类别都有12500张) . 我们将其两类分别随机分出了1000张作为训练集, 各500张作为验证集 500张作为测试集数目.
@@ -146,30 +143,27 @@ VGG是由Karen Simonyan和Andrew Zisserman在2014年开发, ImageNet的识别, �
 \end{figure}
 
 此模型的准确度约为73.3\%, 并不是十分的高, 由于网络并不是很大, 训练速度也十分的快. 
-\subsection{改进实验细节}
+\subsection{改进模型细节}
 
 因为算力的短板, 我们另寻他路. 希望能够尽量提高在这样的算力所允许自由实验的前提下达到最好的结果. 我们从第一次试验的结果里可以发现我们的问题主要是算力能够驱动的数据量太小导致了过拟合. 于是我们便引入了数据增强与预训练模型VGG19来进行改进. 并且我们在试验后期又加入了两块新的GPU, 使得我们能够从容地对VGG19的最后段的卷积进行解锁训练, 进一步地提升了性能. 同时我们又测试了VGG16的性能, 发现VGG19比VGG16的表现强大约1\%. 
-
-
-
-
-\subsubsection{数据增强避免过拟合}
-由于我们的限制, 能够调用的学习样本并不算多, 可能会出现过拟合的情况, 所以我们采用数据增强的方法, 利用多种能够生成可信图像的随机变换来增加样本, 增强泛化能力.  在Keras中, 可以利用ImageDataGenerator读取的图像进行多次随机变化, 其中的随机变换由多个参数控制, 如角度、缩放的范围、平移范围等, 从而生成更多的样本达到抗过拟合的效果, 如 \figref{fig:augcat}.
 \begin{figure}[htbp]
-\centering
-  \includegraphics{aug.png}
-  \caption{通过随机数据增强生成的猫图像\label{fig:augcat}}
-\end{figure}
+	\centering
+	  \includegraphics{aug.png}
+	  \caption{通过随机数据增强生成的猫图像\label{fig:augcat}}
+	\end{figure}
+\subsubsection{数据增强避免过拟合}
+
+由于我们的限制, 能够调用的学习样本并不算多, 可能会出现过拟合的情况, 所以我们采用数据增强的方法, 利用多种能够生成可信图像的随机变换来增加样本, 增强泛化能力.  在Keras中, 可以利用ImageDataGenerator读取的图像进行多次随机变化, 其中的随机变换由多个参数控制, 如角度、缩放的范围、平移范围等, 从而生成更多的样本达到抗过拟合的效果, 如 \figref{fig:augcat}.
 
 其中, 数据增强的变换参数设置为, 随机40度的旋转角, 随机20\%的平移, 随机20\%的放大缩小, 随机20\%的斜向拉伸并允许翻转的条件下, 损失函数为交叉熵, 优化算法为RMSprop, 学习率为1e-5, 此次改进后, 训练结果如下
-\begin{figure}[hbt]
-\centering
-  \includegraphics[width=0.45\textwidth]{small_aug_1.png}
-  \includegraphics[width=0.45\textwidth]{small_aug_2.png}
-  \caption{数据增强后的训练结果.}
-\end{figure}
+\begin{figure}[htbp]
+	\centering
+	  \includegraphics[width=0.45\textwidth]{small_aug_1.png}
+	  \includegraphics[width=0.45\textwidth]{small_aug_2.png}
+	  \caption{数据增强后的训练结果.}
+	\end{figure}
 
-实现了在测试集上81.8\%的准确率. 表现不错但是依然不尽如人意.
+此模型实现了在测试集上81.8\%的准确率. 表现不错但是依然不尽如人意.
 
 \subsubsection{引入预训练模型VGG19}
 由于自建的网络深度不够可能是准确率不高的主要原因, 我们考虑使用VGG19与训练模型来进行迁移学习. 
@@ -245,7 +239,7 @@ VGG是由Karen Simonyan和Andrew Zisserman在2014年开发, ImageNet的识别, �
 
 为了做到这一点, 我们需要知道这样的滤波器$f_0$在什么样的输入$X$下给出最大的输出值$Y$, 即我们需要在输入空间$\mathcal X$里得到$\arg \max_{X\in \mathcal X} f_0(X)$. 那么我们如果能引入一个度量使得最大化$f_0(X)$等价于最大化这个度量, 我们就可以在输入空间$\mathcal X$上梯度下降来进行优化. 我们取这个度量为网络输出张量的所有坐标的均值. 从一张带有微弱噪声的灰色的(RBG各值在每个坐标上均为128, 加上了一个从均匀随机的噪声$\sigma\in[0,20]$)的图像开始, 调用了Keras后端的Tensorflow里的随机梯度下降函数来进行实现. 并且在对输入空间即图像更新时, 我们采用了归一化的技巧使得我们的更新能够更加稳定. 在第一次尝试可视化的过程中, 我们的训练过程因数值上溢终止, 于是我们在归一化的同时还给里面加入了一个常数1e-5来避免这样的现象. 
 
-通过对五个卷积模块的第一个filter进行了40步的随机梯度下降, 再一次对图像张量进行归一化处理将其颜色坐标转换到[0,1]区间上, 通过调用plt.imshow()函数, 我们终于得到了VGG的filter的第一个可视化图像, 这个Filter似乎对与斑点响应最大. 
+通过对五个卷积模块的第一个filter进行了40步的随机梯度下降, 再一次对图像张量进行归一化处理将其颜色坐标转换到[0,1]区间上, 通过调用plt.imshow()函数, 我们终于得到了VGG的filter的第一个可视化图像, 这个Filter似乎对与斑点图案的响应最大. 
 \begin{figure}[htbp]
 	\centering
   \hspace{-30pt}\includegraphics[width=0.5\textwidth]{block2_conv1_127.png}
