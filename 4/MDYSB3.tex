@@ -44,6 +44,13 @@
 
 我们使用了sklearn中ensemble类里的AdaBoostClassifier类. 数据集选用了UCI数据集中的IRIS数据集. IRIS数据集是一个花卉分类数据集, 其中给出了标记好的三种花卉(Iris Setosa-山鸢尾, Iris Versicolour-杂色鸢尾, 以及Iris Virginica-维吉尼亚鸢尾), 以及其所对应的四个特征(花萼长度, 花萼宽度, 花瓣长度, 花瓣宽度). 我们的任务是学习一个函数, 使得其通过输入这三种花其中的某一种的一个植株的这四个参数, 能够判断出这个植株是哪一种花. 这是一个典型的分类问题, IRIS数据集也是应用广泛的数据分类数据集. 我们首先将数据集分为训练集与测试集两部分进行训练.
 
+\begin{figure}[hbt]
+\centering
+  \includegraphics[width=0.75\textwidth]{flower.png}
+  \caption{弗吉尼亚莺尾的花萼与花瓣示意图\label{fig:VGflower}}
+\end{figure}
+
+
 \subsection{决策树弱学习机}
 
 我们的模型采用了50个决策树作为弱学习机, 采用了默认的学习率1. Sklearn的AdaboostClassifier能够全自动地帮我们完成优化损失函数%\todo{损失函数是啥}. 
