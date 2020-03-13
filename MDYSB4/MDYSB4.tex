@@ -21,7 +21,7 @@
 
 \begin{document}
 
-
+\includepdf[width=\paperwidth]{FM.pdf}
 \newpage
 \maketitle
 
@@ -91,13 +91,13 @@ AdaBoost是一种迭代集成方法. AdaBoost分类器通过组合多个性能�
 
 \begin{figure}[htbp]
 \centering
-  \includegraphics[width=0.2\textwidth]{flower.png}
+  \includegraphics[width=0.3\textwidth]{flower.png}
   \caption{弗吉尼亚莺尾的花萼与花瓣示意图\label{fig:VGflower}}
 \end{figure}
 
-
-\subsection{决策树弱学习机}
-
+\section{训练结果}
+\subsection{初次结果}
+\subsubsection{决策树弱学习机}
 我们的模型采用了50个决策树作为弱学习机, 采用了默认的学习率Sklearn的AdaboostClassifier能够全自动地帮我们完成优化损失函数. 我们在测试集上获得了87.6\%的准确率. 这并不是一个多么令人可喜的结果. 我们希望了解我们的模型哪里出了问题. 于是我们尝试了可视化模型.
 
 \begin{figure}[htbp]
@@ -115,38 +115,37 @@ AdaBoost是一种迭代集成方法. AdaBoost分类器通过组合多个性能�
 
 
 
-
-\subsection{学习机数量提升}
-
-%\todo{改个参数}
-
-\begin{figure}[htbp]
+\subsection{适当的改进}
+\subsubsection{学习机数量提升}
+一个最简单的改进的思路就是去增加弱学习机的数量, 通过更大的学习规模去对函数做更好的拟合. 那么我们在增加学习机的规模的时候并没有任何的效果上的提升. 甚至还有所下降. 通过简化版学习机的分类边界可视化, 我们不难观察到这样的增加弱学习机的数量并没有对我们的分类边界产生任何实质性的影响. 甚至都没有增加分类边界的曲折程度, 只是边的位置有了一定调整. 所以我们基本可以认为此时模型的限制基本完全来源于弱学习机的分类特点.
+\begin{center}
+  \includegraphics[width=0.35\textwidth]{adat50}
+  \includegraphics[width=0.35\textwidth]{adat100}
+\end{center}
+\begin{figure}[h]
   \centering
-    \includegraphics[width=0.4\textwidth]{adat50}
-    \includegraphics[width=0.4\textwidth]{adat100}\\
-    \includegraphics[width=0.4\textwidth]{adat150}
-    \includegraphics[width=0.4\textwidth]{adat200}
+    \includegraphics[width=0.35\textwidth]{adat150}
+    \includegraphics[width=0.35\textwidth]{adat200}
     \caption{我们的弱学习机数量从50增加到了100、150、200. 可以看到其并没有任何的明显的质变, 分类边界并没有变细腻, 只是边界的位置换了地方.}
   \end{figure}
 
-那么一个最简单的改进的思路就是去增加弱学习机的数量, 通过更大的学习规模去对函数做更好的拟合. 那么我们在增加学习机的规模的时候并没有任何的效果上的提升. 甚至还有所下降. 通过简化版学习机的分类边界可视化, 我们不难观察到这样的增加弱学习机的数量并没有对我们的分类边界产生任何实质性的影响. 甚至都没有增加分类边界的曲折程度, 只是边的位置有了一定调整. 所以我们基本可以认为此时模型的限制基本完全来源于弱学习机的分类特点.
 
 
 
 
 
 
-\subsection{支撑向量机弱学习机}
+\subsubsection{支撑向量机弱学习机}
 
 
+
+
+根据我们上面的分析, 结合Boosting过程的特性, 另外一个显然的想法就是尝试不同的弱学习机去提升我们的分类准确率. 我们又尝试了支撑向量机作为我们的弱学习机去进行Adaboosting学习. sklearn.svm类中的svc类给我们提供这样现成的弱学习机. 在支撑向量机里, 我们采用了线性的核函数. 通过使用相同的参数, 我们发现这样的弱学习机的选取也可以极大程度上的影响我们的分类准确率. 我们的分类准确率从87.6\%提升到了94.1\%. 几乎正确分对了绝大多数的测试集里的数据.
 \begin{figure}[htbp]	
   \centering
     \includegraphics[width=0.7\textwidth]{svm50}
     \caption{采用了svm作为弱学习机的adaboost算法. 能够明显地以更简单的方式更好地捕捉类与累之间的边界.}
   \end{figure}
-
-根据我们上面的分析, 结合Boosting过程的特性, 另外一个显然的想法就是尝试不同的弱学习机去提升我们的分类准确率. 我们又尝试了支撑向量机作为我们的弱学习机去进行Adaboosting学习. sklearn.svm类中的svc类给我们提供这样现成的弱学习机. 在支撑向量机里, 我们采用了线性的核函数. 通过使用相同的参数, 我们发现这样的弱学习机的选取也可以极大程度上的影响我们的分类准确率. 我们的分类准确率从87.6\%提升到了94.1\%. 几乎正确分对了绝大多数的测试集里的数据.
-
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.7\textwidth]{svm100}
