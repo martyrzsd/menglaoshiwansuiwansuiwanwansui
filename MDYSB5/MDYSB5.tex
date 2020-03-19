@@ -55,8 +55,16 @@
     \caption{从左到右、从上到下$k$的值依次增加, 最后一张图为原图. \label{fig:cat1}}
 \end{figure}
 
-
-
+每张图片的大小如下表所示
+\begin{table}[h]
+    \centering
+    \begin{tabular}{c|ccccc}
+    \hline
+    图片大小 (字节)  & $k=8$   & $k=16$   & $k=32$   & $k=64$   & $k=128$  \\ \hline
+    682078   & 45197 & 75804  & 123399 & 165238 & 237626 \\
+    压缩率 (\%) & 6.626 & 11.114 & 18.092 & 24.226 & 34.839 \\ \hline
+    \end{tabular}
+\end{table}
 
 
 \newpage
