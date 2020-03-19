@@ -42,16 +42,16 @@
 \subsection{实际表现}
 基于以上的想法, 我们对于两张动物图片进行了压缩, 聚类簇数分别选为$k=8,\,16,\,32,\,64,\,128$.
 
-\noindent 首先, 对于第一张图片进行了压缩, 得到的结果分别如 \figref{fig:cat}.
+\noindent 首先, 对于第一张图片进行了压缩, 得到的结果分别如 \figref{fig:cat1}.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=.25\textwidth]{cat1/8.png}
-    \includegraphics[width=.25\textwidth]{cat1/16.png}
-    \includegraphics[width=.25\textwidth]{cat1/32.png}\\
-    \includegraphics[width=.25\textwidth]{cat1/64.png}
-    \includegraphics[width=.25\textwidth]{cat1/128.png}
-    \includegraphics[width=.25\textwidth]{cat1/Origin.png}
+    \includegraphics[width=.3\textwidth]{cat1/8.png}
+    \includegraphics[width=.3\textwidth]{cat1/16.png}
+    \includegraphics[width=.3\textwidth]{cat1/32.png}\\
+    \includegraphics[width=.3\textwidth]{cat1/64.png}
+    \includegraphics[width=.3\textwidth]{cat1/128.png}
+    \includegraphics[width=.3\textwidth]{cat1/Origin.png}
     \caption{从左到右、从上到下$k$的值依次增加, 最后一张图为原图. \label{fig:cat1}}
 \end{figure}
 
@@ -66,6 +66,31 @@
     \end{tabular}
 \end{table}
 
+从图中可以看出, 实际上$k$取64甚至32时, 压缩过的图片就已经大致和原图相似了. 
+
+之后, 对于第二张图片进行了压缩, 得到的结果分别如 \figref{fig:cat2}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=.3\textwidth]{cat2/8.png}
+    \includegraphics[width=.3\textwidth]{cat2/16.png}
+    \includegraphics[width=.3\textwidth]{cat2/32.png}\\
+    \includegraphics[width=.3\textwidth]{cat2/64.png}
+    \includegraphics[width=.3\textwidth]{cat2/128.png}
+    \includegraphics[width=.3\textwidth]{cat2/Origin.png}
+    \caption{从左到右、从上到下$k$的值依次增加, 最后一张图为原图. \label{fig:cat2}}
+\end{figure}
+
+每张图片的大小如下表所示
+\begin{table}[]
+    \centering
+    \begin{tabular}{c|ccccc}
+    \hline
+    图片大小 (字节)  & k=8    & k=16   & k=32   & k=64   & k=128  \\ \hline
+    1140062  & 132802 & 248046 & 428423 & 656589 & 874825 \\
+    压缩率 (\%) &        &        &        &        &        \\ \hline
+    \end{tabular}
+    \end{table}
 
 \newpage
 \nocite{*}
