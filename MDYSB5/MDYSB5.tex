@@ -16,7 +16,7 @@
 \maketitle
 
 	
-% \tableofcontents
+\tableofcontents
 \thispagestyle{empty}
 \newpage
 \normalsize
@@ -25,7 +25,7 @@
 \section{K-means用于图片压缩}
 在日常生活中, 由于图像和视频本身的数据量非常大, 这就给给存储和传输带来了很多不便, 所以图像压缩和视频压缩得到了非常广泛的应用. 比如数码相机、USB 摄像头、可视电话视频点播、视频会议系统、数字监控系统等等, 都使用到了图像或视频的压缩技术. 在此, 下文将介绍一种使用k-means算法进行图像压缩的算法. 
 \subsection{颜色量化算法(Color quantization algorithm)}
-实际上, k-means进行图像压缩是一种颜色量化算法的实际应用. 颜色量化是利用人眼对颜色的惰性, 将原图像中不太重要的相似颜色合并为一种颜色, 减少图像中的颜色, 而使量化前后的图像对于人眼的认识误差最小, 即量化误差最小. 在彩色图像中, 每个像素的大小为3字节(RGB), 其中每种颜色的强度值都可以在0到255之间. 按照组合运算, 可以表示的颜色总数为256 * 256 * 256. 因此, 图像压缩的主要目标是使用颜色量化来压缩图像, 并且在图像的失真不是太明显的情况下减小图像的储存空间. 
+实际上, k-means进行图像压缩是一种颜色量化算法的实际应用. 颜色量化是利用人眼对颜色的惰性, 将原图像中不太重要的相似颜色合并为一种颜色, 减少图像中的颜色, 而使量化前后的图像对于人眼的认识误差最小, 即量化误差最小. 在彩色图像中, 每个像素的大小为3字节(RGB), 其中每种颜色的强度值都可以在0到255之间. 按照组合运算, 可以表示的颜色总数为256 $\times$ 256 $\times$ 256. 因此, 图像压缩的主要目标是使用颜色量化来压缩图像, 并且在图像的失真不是太明显的情况下减小图像的储存空间. 
 \subsection{k-means压缩算法具体步骤}
 \begin{figure}[ht]
     \centering
@@ -40,15 +40,15 @@
 
 更一般的, 若原图像尺寸为$m\times n$, 选取聚类簇数为$k$, 则可将一般的RGB图像压缩为原图像的$$\frac{m\times n \times \log_2k+24\times k}{24\times m\times n}\times 100\%.$$
 \subsection{实际表现}
-基于以上的想法, 我们对于两张动物图片进行了压缩, 聚类簇数分别选为$k=8,\,16,\,32,\,64,\,128$.
-
-\noindent 首先, 对于第一张图片进行了压缩, 得到的结果分别如 \figref{fig:cat1}.
+基于以上的想法, 我们对于两张动物图片进行了压缩, 聚类簇数分别选为$k=8,\,16,\,32,\,64,\,128$. 首先, 对于第一张图片进行了压缩, 得到的结果分别如 \figref{fig:cat1}.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=.3\textwidth]{cat1/8.png}
     \includegraphics[width=.3\textwidth]{cat1/16.png}
     \includegraphics[width=.3\textwidth]{cat1/32.png}\\
+
+    \vspace{2pt}
     \includegraphics[width=.3\textwidth]{cat1/64.png}
     \includegraphics[width=.3\textwidth]{cat1/128.png}
     \includegraphics[width=.3\textwidth]{cat1/Origin.png}
@@ -62,11 +62,11 @@
     \hline
     图片大小 (字节)  & $k=8$   & $k=16$   & $k=32$   & $k=64$   & $k=128$  \\ \hline
     682078   & 45197 & 75804  & 123399 & 165238 & 237626 \\
-    压缩率 (\%) & 6.626 & 11.114 & 18.092 & 24.226 & 34.839 \\ \hline
+    压缩比 (\%) & 6.626 & 11.114 & 18.092 & 24.226 & 34.839 \\ \hline
     \end{tabular}
 \end{table}
 
-从图中可以看出, 实际上$k$取64甚至32时, 压缩过的图片就已经大致和原图相似了. 
+从图中可以看出, 实际上$k$取64甚至32时, 压缩过的图片就已经大致和原图相似了. 第1至3张图片中因为颜色数较少, 未能表现出猫眼的真实颜色, 但对猫毛的颜色刻画逐渐生动, 到第4张时已经非常接近原图给人的视觉观感. 
 
 之后, 对于第二张图片进行了压缩, 得到的结果分别如 \figref{fig:cat2}.
 
@@ -75,6 +75,8 @@
     \includegraphics[width=.3\textwidth]{cat2/8.png}
     \includegraphics[width=.3\textwidth]{cat2/16.png}
     \includegraphics[width=.3\textwidth]{cat2/32.png}\\
+
+    \vspace{2pt}
     \includegraphics[width=.3\textwidth]{cat2/64.png}
     \includegraphics[width=.3\textwidth]{cat2/128.png}
     \includegraphics[width=.3\textwidth]{cat2/Origin.png}
@@ -82,20 +84,53 @@
 \end{figure}
 
 每张图片的大小如下表所示
-\begin{table}[]
+\begin{table}[ht]
     \centering
     \begin{tabular}{c|ccccc}
     \hline
-    图片大小 (字节)  & k=8    & k=16   & k=32   & k=64   & k=128  \\ \hline
+    图片大小 (字节)  & $k=8$    & $k=16$   & $k=32$   & $k=64$   & $k=128$  \\ \hline
     1140062  & 132802 & 248046 & 428423 & 656589 & 874825 \\
-    压缩率 (\%) &        &        &        &        &        \\ \hline
+    压缩比 (\%) & 11.647 & 21.757 & 37.579 & 57.592 & 76.735 \\ \hline
     \end{tabular}
-    \end{table}
+\end{table}
+
+相比于 \figref{fig:cat1}, \figref{fig:cat2} 的颜色构成较为简单, 主色即为蓝、白、黑, 所以可以看出在第2张图中, 只使用8种颜色时, 便已经可以基本表现出猫毛、猫眼等主要特征, 虽然在色彩交界处出现了比较明显的断层. 不过它的大小仅为原图的1/10, 可以说是一种比较高效的图像压缩方式. 
+
+
+
+
+
+
+
+
+
+但k-means图像压缩仍是一种有损的图像压缩方式, 即以牺牲一些图像信息为代价减少图片大小, 目前也已经有了各种无损的压缩图片技术, 但多半都有压缩比率不高的问题存在, 但我们相信随着科学技术的发展, 会有更加完善的无损压缩技术出现. 
+
+
+
+
+
+
+
+
+
+
+\section{FCM和KFCM算法在图像分割中的应用及对比}
+\Huge 这几个引用明天查一下
+
+\normalsize
+K-means算法可以看作高斯混合聚类在混合成分方差相等、且每个样本仅指派给一个混合成分时的特例. 而基于K-means的思想也继而衍生了很多变体, 如k-medoids算法[Kaufman and Rousseeuw,1987]强制原型向量必为训练样本, k-mosed算法[Huang,1988]可处理离散属性. FCM[Bezdek,1981]则是“软聚类”算法, 允许每个样本以不同程度属于多个原型. 引入核技巧则可得KFCM算法. 
+\subsection{FCM算法}
+
+
+
+
+
+
 
 \newpage
 \nocite{*}
 
-% 如果想修改参考文献样式( 非国标 ), 请把下行取消注释, 并换成合适的样式( 比如 unsrt, plain 样式 ). 
 \bibliographystyle{unsrt}
 \bibliography{wpref}
 
