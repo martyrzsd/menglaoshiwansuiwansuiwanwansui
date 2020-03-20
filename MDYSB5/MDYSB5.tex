@@ -66,29 +66,32 @@
     \end{tabular}
 \end{table}
 
-\begin{figure}[ht]
-\centering
-  \includegraphics[width=0.9\textwidth]{cat1to}
-  \caption{\label{cat2tradeoff}}
-\end{figure}
-
-
-
-
 从图中可以看出, 实际上$k$取64甚至32时, 压缩过的图片就已经大致和原图相似了. 第1至3张图片中因为颜色数较少, 未能表现出猫眼的真实颜色, 但对猫毛的颜色刻画逐渐生动, 到第4张时已经非常接近原图给人的视觉观感. 
 
-之后, 对于第二张图片进行了压缩, 得到的结果分别如 \figref{fig:cat2}.
+为了度量压缩图片的失真度, 我们将原图片与压缩后的图片逐像素点做差, 将误差绝对值之和作为对图片失真度的一个量化. 
 
 \begin{figure}[ht]
     \centering
+
+    \hspace{50pt}\includegraphics[width=0.75\textwidth]{cat1to}
+    \caption{\label{cat2tradeoff}}
+\end{figure}
+
+从中, 我们可以看出, 在$k=5$时, 压缩比和失真度达到了一个比较均衡的状态, 所以在此时选用32位色彩进行压缩时, 可以保证失真度不是很高的情况下达到较好的压缩比. 
+
+
+之后, 对于第二张图片进行了压缩, 得到的结果分别如下:
+\begin{center}
     \includegraphics[width=.3\textwidth]{cat2/8.png}
     \includegraphics[width=.3\textwidth]{cat2/16.png}
-    \includegraphics[width=.3\textwidth]{cat2/32.png}\\
-
-    \vspace{2pt}
-    \includegraphics[width=.3\textwidth]{cat2/64.png}
-    \includegraphics[width=.3\textwidth]{cat2/128.png}
-    \includegraphics[width=.3\textwidth]{cat2/Origin.png}
+    \includegraphics[width=.3\textwidth]{cat2/32.png}
+\end{center}
+\begin{figure}[ht]
+    \centering
+    
+    \includegraphics[width=.28\textwidth]{cat2/64.png}
+    \includegraphics[width=.28\textwidth]{cat2/128.png}
+    \includegraphics[width=.28\textwidth]{cat2/Origin.png}
     \caption{从左到右、从上到下$k$的值依次增加, 最后一张图为原图. \label{fig:cat2}}
 \end{figure}
 
@@ -103,53 +106,81 @@
     \end{tabular}
 \end{table}
 
-相比于 \figref{fig:cat1}, \figref{fig:cat2} 的颜色构成较为简单, 主色即为蓝、白、黑, 所以可以看出在第2张图中, 只使用8种颜色时, 便已经可以基本表现出猫毛、猫眼等主要特征, 虽然在色彩交界处出现了比较明显的断层. 不过它的大小仅为原图的1/10, 可以说是一种比较高效的图像压缩方式. 
+同样的, 我们绘制了它的失真度与压缩比曲线
+\begin{center}
+    \hspace{53pt}\includegraphics[width=0.75\textwidth]{cat2to}
+\end{center}
 
+相比于 \figref{fig:cat1}, \figref{fig:cat2} 的颜色构成较为简单, 主色即为蓝、白、黑, 所以可以看出在第2张图中, 只使用8种颜色时, 便已经可以基本表现出猫毛、猫眼等主要特征, 虽然在色彩交界处出现了比较明显的断层. 因此, 此时选用16位颜色便能够在大小和质量上做到很好地平衡.
 
-
-\begin{figure}[ht]
-\centering
-  \includegraphics[width=0.9\textwidth]{cat2to}
-  \caption{\label{cat2tradeoff}}
-\end{figure}
-
-
-
-
-
-
+通过这两张图片的k-means压缩的对比, 可以发现, k值的选取与图片本身十分相关. 当图片内容比较多时, 需要选取较大的k值才能更好地保留原图像的信息. 
 
 但k-means图像压缩仍是一种有损的图像压缩方式, 即以牺牲一些图像信息为代价减少图片大小, 目前也已经有了各种无损的压缩图片技术, 但多半都有压缩比率不高的问题存在, 但我们相信随着科学技术的发展, 会有更加完善的无损压缩技术出现. 
 
 
-
-
-
-
-
-
-
-
 \section{FCM和KFCM算法在图像分割中的应用及对比}
-\Huge 这几个引用明天查一下
 
-\normalsize
-K-means算法可以看作高斯混合聚类在混合成分方差相等、且每个样本仅指派给一个混合成分时的特例. 而基于K-means的思想也继而衍生了很多变体, 如k-medoids算法[Kaufman and Rousseeuw,1987]强制原型向量必为训练样本, k-mosed算法[Huang,1988]可处理离散属性. FCM[Bezdek,1981]则是“软聚类”算法, 允许每个样本以不同程度属于多个原型. 引入核技巧则可得KFCM算法. 
-\subsection{FCM算法}
+K-means算法可以看作高斯混合聚类在混合成分方差相等、且每个样本仅指派给一个混合成分时的特例. 而基于K-means的思想也继而衍生了很多变体, 如k-medoids算法\cite{RousseeuwPrincipal}强制原型向量必为训练样本, k-mosed算法[\cite{JingPalladium}可处理离散属性. FCM\cite{Bezdek1981Pattern}则是“软聚类”算法, 允许每个样本以不同程度属于多个原型. 引入核技巧则可得KFCM算法. 
+\subsection{k-means与模糊聚类算法的对比}
+在k-means中, 目标函数是最小化此公式
 \begin{equation*}
 J(\theta)=\sum_{i=1}^k\sum_{k=1}^N d^2(x_k,\theta_i)
 \end{equation*}
-\\ 模糊聚类算法对象函数的数学模型为：
+\\而模糊聚类算法的目标函数则为
 \begin{equation*}
 	J(U,\theta)=\sum_{i=1}^c\sum_{k=1}^Nu_{ik}^m d^2(x_k,\theta_i)
 \end{equation*}
-其中$m$为模糊指数，$m>1$，$U$为隶属度矩阵，$\mu_{ik}$为隶属度(即$U$的元素)，
-\ $d(\ \cdot \ , \ \cdot \ )$为不相似测度函数，$x_k$是输入样本特征，$\theta_i$是聚类中心，$N$是输入样本(即图像像素)总数，$c$为聚类数目。
-\par 聚类的过程是通过调整$U$和$\theta$使上式的求和值最小化。可以理解这个最小化过程是一个聚类过程：要使该求和式最小，则要求其中的每一乘积项最小，就是说，$d(\ \cdot \ , \ \cdot \ )$大的项，要由小的$\mu_{ik}$与其相乘。换言之，样本与聚类中心越不相似，则要求该样本对这个聚类中心的隶属度越小，反之，则隶属度越大。由此看出上式的收敛过程就是一个聚类过程。
-\par 对比K-means与FCM的目标函数，可以知道，K-means是排他性聚类算法，即一个数据点只能属于一个类别，而FCM只计算数据点雨各个类别的相似度，即对于任意一个数据点，使用K-means算法，其属于某个类别非否即是，而对于FCM算法，其属于某个类别的相似度只是一个百分比。
+其中$m$为模糊指数, $m>1$, $U$为隶属度矩阵, $\mu_{ik}$为隶属度(即$U$的元素), 
+\ $d(\ \cdot \ , \ \cdot \ )$为不相似测度函数, $x_k$是输入样本特征, $\theta_i$是聚类中心, $N$是输入样本(即图像像素)总数, $c$为聚类数目. 
+\par 聚类的过程是通过调整$U$和$\theta$使上式的求和值最小化. 可以理解这个最小化过程是一个聚类过程：要使该求和式最小, 则要求其中的每一乘积项最小, 就是说, $d(\ \cdot \ , \ \cdot \ )$大的项, 要由小的$\mu_{ik}$与其相乘. 换言之, 样本与聚类中心越不相似, 则要求该样本对这个聚类中心的隶属度越小, 反之, 则隶属度越大. 由此看出上式的收敛过程就是一个聚类过程. 
+\par 对比K-means与FCM的目标函数, 可以知道, K-means是排他性聚类算法, 即一个数据点只能属于一个类别, 而FCM只计算数据点雨各个类别的相似度, 即对于任意一个数据点, 使用K-means算法, 其属于某个类别非否即是, 而对于FCM算法, 其属于某个类别的相似度只是一个百分比. 
 
+基于FCM, 又引入了核方法形成了KFCM. 核方法的基本思想是通过非线性映射$\phi$隐式地将输入空间x中的样本映射到一个高维的特征空间, 并在这个高维空间中应用线性算法, 使其等价于原空间中的非线性算法, 从而改善算法的分类能力. 
+\subsection{图像分割的原理}
+FCM与KFCM对图像进行分割的原理与对于普通数据进行聚类没有什么太大的区别, 就只是将普通的数据集换成了图像的灰度矩阵而已. 通过对不同灰度的像素点的聚类实现图像的分割. 
+\subsection{FCM与KFCM结果对比}
+我们使用磁共振成像(Magnetic Resonance Imaging, 简称MRI)图像作为实验对象, 磁共振成像作为作为颅脑检查的有效手段可以形成多方向的图像, 其数据分辨率、软组织对比度高、可以提供其他成像技术难以匹敌的分辨率, 对病灶的定位更加准确, 可以提供更加准确的颅内病理和生理信息. 
 
+MRI有不同事物序列, 最常用的是T1加权序列和T2加权序列, T1序列产生的图与T2序列的图相配合, 更便于医生看清楚病变. 一般来说医学上常使用6张MRI图结合观察, 所以这里对于FCM和KFCM的聚类数设为6, 且KFCM中核参数取150. 原图为如 \figref{fig:BO}.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=.35\textwidth]{Brain/Origin}
+    \caption{\label{fig:BO}}
+\end{figure}
 
+FCM的聚类结果如 \figref{fig:FCM}
+\begin{center}
+    \includegraphics[width=.25\textwidth]{Brain/FCM/2020-03-19_21-07-36Kind1.jpg}
+    \includegraphics[width=.25\textwidth]{Brain/FCM/2020-03-19_21-07-36Kind2.jpg}
+    \includegraphics[width=.25\textwidth]{Brain/FCM/2020-03-19_21-07-36Kind3.jpg}
+\end{center}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=.25\textwidth]{Brain/FCM/2020-03-19_21-07-36Kind4.jpg}
+    \includegraphics[width=.25\textwidth]{Brain/FCM/2020-03-19_21-07-36Kind5.jpg}
+    \includegraphics[width=.25\textwidth]{Brain/FCM/2020-03-19_21-07-36Kind6.jpg}
+    \caption{从左到右、从上到下一次为第1到6类的聚类结果. \label{fig:FCM}}
+\end{figure}
+
+之后, 还使用了KFCM对于原图像进行了分割, 得到的结果如 \cite{fig:KFCM}.
+\begin{figure}
+    \centering
+    \includegraphics[width=.25\textwidth]{Brain/KFCM150/2020-03-19_21-10-05Kind3.jpg}
+    \includegraphics[width=.25\textwidth]{Brain/KFCM150/2020-03-19_21-10-05Kind1.jpg}
+    \includegraphics[width=.25\textwidth]{Brain/KFCM150/2020-03-19_21-10-05Kind5.jpg}\\
+
+    \vspace{2pt}
+    \includegraphics[width=.25\textwidth]{Brain/KFCM150/2020-03-19_21-10-05Kind4.jpg}
+    \includegraphics[width=.25\textwidth]{Brain/KFCM150/2020-03-19_21-10-05Kind6.jpg}
+    \includegraphics[width=.25\textwidth]{Brain/KFCM150/2020-03-19_21-10-05Kind2.jpg}
+    \caption{从左到右、从上到下一次为第1到6类的聚类结果. \label{fig:KFCM}}
+\end{figure}
+
+可以看到两个方法的聚类结果基本上无法用肉眼区别, 通过查阅资料得知需要通过比较每个像素是否正确分类来判断性能, 由于我们医学这使得匮乏和硬件限制, 所以我们的实验停止在这一步. 
+
+虽然无法切实比较两个算法的性能, 但可以看到通过FCM和KFCM我们能成功将原始的MRI图“切片”, 即从原本的一张二维图片中提取出六个层次的信息, 为医生的分析提供了便利. 
+
+通过这样的一个应用, 可以看到, 输入的图片进入计算机后, 计算机识别每个像素灰度后进行聚类分析生成多层次图供以我们参考和进行医学诊断, 其实这也可以看做广义的“编码解码”过程, 在这个过程中计算机实现了“编码”、“储存”, 通过图像我们所进行决策判断的过程即为“解码”过程. 
 
 
 \newpage
