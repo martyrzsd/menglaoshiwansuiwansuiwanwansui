@@ -27,182 +27,56 @@
 \end{abstract}
 
 
-\section{模板介绍}
+\section{GAN简介}
 
-此模板是基于 \LaTeX{} 的标准文类 article设计，也即意味着你可以把 article 文类的选项传递给本模板，比如 \lstinline{a4paper, 10pt} 等等（推荐使用 \lstinline{11pt}）。本模板支持 \lstinline{PDFLaTeX} 和 \lstinline{XeLaTeX}\footnote{中文字体均使用 \lstinline{ctex} 包设置。} 两种编译方式。
+GAN于2014年由Goodfellow等人提出. 其是一个生成式模型, 由一个生成模型G与一个判别模型D组成. 他可以从一个噪声分布生成出一个类似于训练数据的样本, 类似到在统计上无法区分. 
 
-数学字体的效果如下：
+\subsection{工作原理}
 
-\begin{equation}
-(a+3b)^{n} = \sum_{k=0}^{n} C_{n}^{k} a^{n-k} (3b)^k\label{eq:binom}
-\end{equation}
-      
-\subsection{全局选项}
-我在这个模板中定义了一个语言选项 \lstinline{lang}，可以选择英文模式 \lstinline{lang=en}（默认）或者中文模式 \lstinline{lang=cn}。当选择中文模式时，图表的标题引导词以及参考文献，定理引导词等信息会变成中文。你可以通过下面两种方式来选择语言模式：
+GAN的工作原理来源于博弈论中的零和博弈. 其生成模型与判别模型的存在目的都是为了打败对方. 生成模型能够将一个随机向量输出成一个生成数据. 而判别模型是以一个生成或者真实数据为输入, 输出一个标签作为其到底是生成的还是真实的的预测.
 
-\begin{lstlisting}
-\documentclass[lang=cn]{elegantpaper} % or
-\documentclass{cn}{elegantpaper} 
-\end{lstlisting}
+生成模型的目标是为了去欺骗判别模型, 随着训练的进行, 我们的生成模型应该能够生成越来越逼真的数据去欺骗判别模型, 以至于我们的判别模型的误判率越来越高. 而判别模型也在不断适应着生成模型, 其对数据真实性的判定标准随着训练的进行也变得越来越高, 希望能够尽力从所有数据中辨别出生成数据. 
+
+而这样的训练过程一旦结束, 我们的生成器此时输入一个噪声, 就可以一一个比较高的可信度把这个随机噪声转化成一个统计上与真实数据无异的生成数据. 
+
+\subsection{训练过程}
+
+抽取随机噪声
+
+生成模型生成数据
+
+将生成数据与真实数据混合加上标签
+
+将带标签的数据训练辨别模型
+
+再一次抽取随机噪声
+
+生成模型生成数据
+
+用刚刚更新过的D所给出的标记为真实数据的标签来更新生成器的权重
+
+\subsection{训练的困难性}
+
+GAN的理想非常美好, 但是GAN的训练十分困难. 对于一个一般的网络, 其优化的最小值通常是固定的. 如果我们用随机梯度下降算法去对性能度量进行优化, 就相当于一个小球随着输入空间随着性能度量所决定的一个地形滚到他能滚到的最低点. 这个过程是静态的. 但是对于GAN而言, 整个过程是动态的. 小球每滚一步, 这个性能度量的地形就会改变一次, 我们寻找的不是一个最小值, 而是两个网络之间的一种平衡. 这给我们的训练带来了极大的困难. 我们需要不断的对我们的各种超参数进行调整, 反复试验从而观察结果. 这也使得GAN的训练成本十分高昂. 目前效果逼真的GAN的每一次训练需要在最先进的单个GPU上跑一个月, 并且每改一次参数我们还需要对网络进行重新训练. 
+
+并且通过这次实验我们深刻地体验到了为什么机器学习被戏称为炼丹术. 
 
 
-\subsection{自定义命令}
-在此模板中，并没有修改任何默认的命令或者环境，所以，你可以在此模板使用原来的命令和环境。另外，我自定义了 3 个命令：
+\section{GAN的简单应用——DCGAN}
 
-\begin{enumerate}
-	\item \lstinline{\email}：创建邮箱地址的链接；
-	\item \lstinline{\figref}：用法和 \lstinline{\ref} 类似，但是会在插图的标题前添加 <\textbf{图 n}> ；
-	\item \lstinline{\tabref}：用法和 \lstinline{\ref} 类似，但是会在表格的标题前添加 <\textbf{表 n}>；
-	\item \lstinline{\keywords}：为摘要环境添加关键词。
-\end{enumerate}
+我们的第一次尝试是GAN的最典型应用场景, 图像生成.
 
-
-
-\subsection{列表环境}
-你可以使用列表环境（\lstinline{itemize}、\lstinline{enumerate}、\lstinline{description}），示例如下：\\[2ex]
-\begin{minipage}[c]{0.59\linewidth}
-\begin{lstlisting}
-\begin{itemize}
-   \item Routing and resource discovery;
-   \item Resilient and scalable networks; 
-   \item Distributed storage and search.
-\end{itemize}
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}[c]{0.4\linewidth}
-\begin{itemize}
-   \item Routing and resource discovery;
-   \item Resilient and scalable networks;
-   \item Distributed storage and search.
-\end{itemize}
-\end{minipage}
+\subsection{网络架构}
 
 
 
 
-\subsection{插图}
-插图的命令和以前一样，也是使用 \lstinline{figure} 环境。\figref{fig:scatter} 显示了插图的效果。你可以把你的图放到当前工作目录的如下子目录下 (\lstinline{./image/}, \lstinline{./img/}, \lstinline{./figure/}, \lstinline{./fig/})。
+\section{GAN的训练过程可视化}
 
-
-\begin{lstlisting}
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=0.6\textwidth]{scatter.pdf}
-	\caption{Scatter Plot Example \label{fig:scatter}}
-\end{figure}
-\end{lstlisting}
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=0.6\textwidth]{scatter.pdf}
-	\caption{Scatter Plot Example \label{fig:scatter}}
-\end{figure}
-
-\subsection{表格}
-我强烈建议你使用 \lstinline{booktabs} 宏包，这个宏包有三个命令 \lstinline{\toprule}、\lstinline{\midrule} 和 \lstinline{\bottomrule} 能方便你制作三线表。\tabref{tab:reg} 是一个示例：
-
-\begin{lstlisting}
-\begin{table}[htbp]
-  \small
-  \centering
-  \caption{Auto MPG and Price \label{tab:reg}}
-    \begin{tabular}{lcc}
-    \toprule
-                    &       (1)         &        (2)      \\
-    \midrule
-    mpg             &    -238.90***     &      -49.51     \\
-                    &     (53.08)       &      (86.16)    \\
-    weight          &                   &      1.75***    \\
-                    &                   &      (0.641)    \\
-    constant        &     11,253***     &       1,946     \\
-                    &     (1,171)       &      (3,597)    \\
-    obs             &        74         &         74      \\
-    $R^2$           &      0.220        &       0.293     \\
-    \bottomrule
-    \multicolumn{3}{l}{\scriptsize Standard errors in parentheses} \\
-    \multicolumn{3}{l}{\scriptsize *** p<0.01, ** p<0.05, * p<0.1} \\
-    \end{tabular}%
-\end{table}%
-\end{lstlisting}
-\begin{table}[htbp]
-  \small
-  \centering
-  \caption{Auto MPG and Price \label{tab:reg}}
-    \begin{tabular}{lcc}
-    \toprule
-                    &       (1)         &        (2)      \\
-    \midrule
-    mpg             &    -238.90***     &      -49.51     \\
-                    &     (53.08)       &      (86.16)    \\
-    weight          &                   &      1.75***    \\
-                    &                   &      (0.641)    \\
-    constant        &     11,253***     &       1,946     \\
-                    &     (1,171)       &      (3,597)   \\
-    obs             &        74         &         74     \\
-    $R^2$           &      0.220        &       0.293    \\
-    \bottomrule
-    \multicolumn{3}{l}{\scriptsize Standard errors in parentheses} \\
-    \multicolumn{3}{l}{\scriptsize *** p<0.01, ** p<0.05, * p<0.1} \\
-    \end{tabular}%
-\end{table}%
+GAN通常都会应用在如生成各种各样的图像的问题上. 这些问题都是十分高维的问题. 假如说我们要生成一个$100\times 100$大小的手写数字, 我们的输入空间的维度便是$100^2$. 那么这么高的维度给可视化带来了巨大的困难. 所以我们考虑了一个更加简单的问题. 对于一个二维均匀分布噪声$\epsilon \sim \mathrm{Unif}[-1,1]$, 给定一个函数$f:\mathbb R^2 \to \mathbb R^2$, 构造出另外一个$\mathrm{supp}$不同的均匀概率分布$\mathcal U$, 或者更酷一点地说是一个潜在流形上的均匀分布. 然后通过GAN来学习$\mathcal U$, 我们希望我们的生成器能够习得这样的一个分布$\mathcal U$.
 
 
 
-\subsection{参考文献}
-此模板使用了 Bib\TeX{} 来生成参考文献，默认使用的文献样式（bib style）是 \lstinline{GB/T 7714-2015}\footnote{通过调用 \href{https://ctan.org/pkg/gbt7714}{\lstinline{gbt7714}} 宏包}。参考文献示例：~\cite{en3} 使用了中国一个大型的 P2P 平台（人人贷）的数据来检验男性投资者和女性投资者在投资表现上是否有显著差异。
-
-你可以在谷歌学术，Mendeley，Endnote 中获得文献条目（bib item），然后把它们添加到 \lstinline{wpref.bib} 中。在文中引用的时候，引用它们的键值（bib key）即可。注意需要在编译的过程中添加 Bib\TeX{} 编译。如果你想在参考文献中添加未引用的文献（部分或者全部），可以使用
-
-\begin{lstlisting}
-\nocite{EINAV2010, Havrylchyk2018} % add the two reference.
-\nocite{*}   % add all the reference in the bib file.
-\end{lstlisting}
-
-如果你想修改参考文献的样式（比如改为 \lstinline{aer}），你可以在导言区将下面代码注释掉。
-\begin{lstlisting}
-\usepackage[authoryear]{gbt7714}
-\end{lstlisting}
-
-并且文档末尾添加
-
-\begin{lstlisting}
-\bibliographystyle{aer}
-\end{lstlisting}
-
-\section{示例}
-在这部分，我提供一个示例文档：
-
-
-\begin{lstlisting}
-\documentclass[lang=cn]{elegantpaper}
-
-% title information
-\title{A Working Paper Example}
-\author{ddswhu} 
-\institute{Elegant\LaTeX{} Group}
-\version{1.00}
-\date{\today}
-
-\begin{document}
-
-\maketitle
-
-\begin{abstract}
-Your abstract goes here.
-\keywords{keyword1, keyword2}
-\end{abstract}
-
-\section{Introduction}
-The content of introduction section.
-
-\section{Conclusion}
-The content of conclusion section.
-
-% include the noncited reference
-\nocite{ref1, ref2}
-\bibliographystyle{aer}
-\bibliography{wpref}
-\end{document}
-\end{lstlisting}
 
 \nocite{*}
 
