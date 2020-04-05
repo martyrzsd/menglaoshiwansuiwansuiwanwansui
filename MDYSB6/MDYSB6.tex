@@ -1,0 +1,216 @@
+%!TEX program = xelatex
+% 完整编译方法 1 pdflatex -> bibtex -> pdflatex -> pdflatex
+% 完整编译方法 2: xelatex -> bibtex -> xelatex -> xelatex
+\documentclass[lang=cn,11pt]{elegantpaper}
+
+\title{ElegantPaper: 一个优美的 \LaTeX{} 工作论文模板}
+\author{\href{https://ddswhu.me/}{邓 东 升}}
+
+\institute{\href{https://elegantlatex.org/}{Elegant\LaTeX{} 项目组}}
+
+% 不需要版本信息，直接注释即可
+\version{0.07}
+% 不需要时间信息的话，需要把 \today 删除。
+\date{\today}
+
+
+% 如果想修改参考文献样式，请把这行注释掉
+% \usepackage[authoryear]{gbt7714}  % 国标
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\noindent 本文为 \href{https://github.com/ElegantLaTeX/ElegantPaper/}{ElegantPaper} 的说明文档（中文）。此模板基于 \LaTeX{} 的 article 类，专为工作论文写作而设计。设计这个模板的初衷是让作者不用关心工作论文的格式，专心写作，从而有更加舒适，简便的写作体验。如果你有其他问题、建议或者报告 bug，可以在 \href{https://github.com/ElegantLaTeX/ElegantPaper/issues}{ElegantPaper/issues} 留言。如果你想了解更多由 Elegant\LaTeX{} 项目组设计的模板，请访问 \href{https://github.com/ElegantLaTeX/}{https://github.com/ElegantLaTeX/}。
+\keywords{Elegant\LaTeX{}，工作论文，模板}
+\end{abstract}
+
+
+\section{GAN简介}
+
+GAN于2014年由Goodfellow等人提出. 其是一个生成式模型, 由一个生成模型G与一个判别模型D组成. 他可以从一个噪声分布生成出一个类似于训练数据的样本, 类似到在统计上无法区分. 
+
+\subsection{工作原理}
+
+GAN的工作原理来源于博弈论中的零和博弈. 其生成模型与判别模型的存在目的都是为了打败对方. 生成模型能够将一个随机向量输出成一个生成数据. 而判别模型是以一个生成或者真实数据为输入, 输出一个标签作为其到底是生成的还是真实的的预测.
+
+生成模型的目标是为了去欺骗判别模型, 随着训练的进行, 我们的生成模型应该能够生成越来越逼真的数据去欺骗判别模型, 以至于我们的判别模型的误判率越来越高. 而判别模型也在不断适应着生成模型, 其对数据真实性的判定标准随着训练的进行也变得越来越高, 希望能够尽力从所有数据中辨别出生成数据. 
+
+而这样的训练过程一旦结束, 我们的生成器此时输入一个噪声, 就可以一一个比较高的可信度把这个随机噪声转化成一个统计上与真实数据无异的生成数据. 
+
+\subsection{训练过程}
+
+抽取随机噪声
+
+生成模型生成数据
+
+将生成数据与真实数据混合加上标签
+
+将带标签的数据训练辨别模型
+
+再一次抽取随机噪声
+
+生成模型生成数据
+
+用刚刚更新过的D所给出的标记为真实数据的标签来更新生成器的权重
+
+\subsection{训练的困难性}
+
+GAN的理想非常美好, 但是GAN的训练十分困难. 对于一个一般的网络, 其优化的最小值通常是固定的. 如果我们用随机梯度下降算法去对性能度量进行优化, 就相当于一个小球随着输入空间随着性能度量所决定的一个地形滚到他能滚到的最低点. 这个过程是静态的. 但是对于GAN而言, 整个过程是动态的. 小球每滚一步, 这个性能度量的地形就会改变一次, 我们寻找的不是一个最小值, 而是两个网络之间的一种平衡. 这给我们的训练带来了极大的困难. 我们需要不断的对我们的各种超参数进行调整, 反复试验从而观察结果. 这也使得GAN的训练成本十分高昂. 目前效果逼真的GAN的每一次训练需要在最先进的单个GPU上跑一个月, 并且每改一次参数我们还需要对网络进行重新训练. 
+
+并且通过这次实验我们深刻地体验到了为什么机器学习被戏称为炼丹术. 
+
+
+\section{GAN的简单应用——DCGAN}
+
+我们的第一次尝试是GAN的最典型应用场景, 图像生成.
+
+\subsection{网络架构}
+
+
+
+
+\section{GAN的训练过程可视化}
+
+GAN通常都会应用在如生成各种各样的图像的问题上. 这些问题都是十分高维的问题. 假如说我们要生成一个$100\times 100$大小的手写数字, 我们的输入空间的维度便是$100^2$. 那么这么高的维度给可视化带来了巨大的困难. 所以我们考虑了一个更加简单的问题. 对于一个二维均匀分布噪声$\epsilon \sim \mathrm{Unif}[-1,1]^2$, 给定一个变换$f:\mathbb [-1,1]^2 \to \mathbb [-1,1]^2$, 构造出另外一个$\mathrm{supp}$不同的概率分布$\mathcal U$. 然后通过GAN来生成$\mathcal U$, 我们希望我们的生成器能够替代这样的一个函数$f$, 能够通过均匀分布生成出我们想要的分布$\mathcal U$.
+
+我们在GAN训练完每个Batch之后将其可视化。我们的网络的生成器和判别器都具有三个全连接层，使用Leaky ReLu激活。生成器和判别器的学习率都为0.001，优化算法都使用默认参数下的Adam优化器。训练结果的图示如下.
+
+\begin{figure}[hbt]
+\centering
+  \includegraphics[width=0.75\textwidth]{sin_2_1}
+  \caption{训练过程可视化的样图, 左上为损失函数, 右上为真实与伪造样本, 左下为输入的噪声空间的判别器输出, 右下为样本空间的判别器输出.}
+\end{figure}
+
+\begin{enumerate}
+	\item 左上方可以看到每个训练步骤的生成器和判别器的损失（二进制交叉熵）和精度.
+	\item 右上方为真实样本和伪造样本, 在每个训练步骤之后，绘制真实分布（蓝色）和生成的分布（红色).
+	\item 左下方显示了隐空间中每个点的判别器输出，其中深蓝色表示判别器认为是“绝对是真的”，深红色表示判别器认为是“绝对是假的”，而白色表示判别器不知道该将其归为哪一类。
+	\item 右下方图与左下方的图非常相似，不同之处在于它使样本空间而不是隐空间可视化了。
+\end{enumerate}
+
+\subsection{正弦波}
+
+我们实验的第一个变换是将整个方块变换为正弦波, 即
+\begin{align}
+	f_x(x,y)&=x\\
+	f_y(x,y)&=sin(x)
+\end{align}
+
+\begin{figure}[hbt]
+\centering
+  \includegraphics[width=0.23\textwidth]{sin_1_1}  
+  \includegraphics[width=0.23\textwidth]{sin_1_2}
+  \includegraphics[width=0.23\textwidth]{sin_1_3}
+  \includegraphics[width=0.23\textwidth]{sin_1_4}
+  \caption{从左到右可以看出我们的变换$f$如何从Unif$[-1,1]^2$生成所需分布$\mathcal U$}
+\end{figure}
+
+我们得到的是一个在这条曲线上的均匀分布.
+
+\begin{figure}[hbt]
+\centering
+  \includegraphics[width=0.45\textwidth]{sin_2_1}
+  \includegraphics[width=0.45\textwidth]{sin_2_2}\\
+  \includegraphics[width=0.45\textwidth]{sin_2_3}
+  \includegraphics[width=0.45\textwidth]{sin_2_4}
+  \caption{我们可以看到我们的网络收敛地十分迅速, 在200次左右的迭代后我们的生成器已经可以生成这样的的数据了. 并且我们的分类器也很好地捕捉到了样本空间的分类边界.}
+\end{figure}
+
+我们的可视化在训练刚开始的时候收敛的十分迅速, 得到了比较好的结果. 因为我们的函数非常简单, 我们的GAN的表现看似非常满意.
+
+
+\subsection{GAN的混沌性}
+
+但是随着实验的进行, GAN的分类器网络的训练呈现出了极度混沌化的特征. 其分类边界与分类区域出现了多次彻底的反转, 并且其变化呈现出了完全没有规律的特点. 在我们的生成器已经很好地捕捉到了分布的前提下, 我们的分类器却在不断摇摆.
+
+\begin{figure}[hbt]
+\centering
+  \includegraphics[width=0.45\textwidth]{sin_3_1}
+  \includegraphics[width=0.45\textwidth]{sin_3_2}\\
+  \includegraphics[width=0.45\textwidth]{sin_3_3}
+  \includegraphics[width=0.45\textwidth]{sin_3_4}
+  \caption{从图上可以看到上下两行的分类器在输入空间中的分类情况在我们的生成器已经习得了需要分布了以后, 发生了彻底的反转. 分类器再经过了几个batch以后彻底推翻了自己之前的结果. 从图上看就是之前是蓝的的地方现在变成了红色, 之前是红色的地方现在变成了蓝色. 下面一行也有着类似的情况.}
+\end{figure}
+
+并且随着训练的进行, 我们的分类器捕捉到的边界反而变得比一开始更加模糊, 之前认为是真实样本的区域完全消失掉了, 同时生成器也出现了较大的波动.
+
+\begin{figure}[hbt]
+  \includegraphics[width=0.45\textwidth]{sin_4_1}
+  \includegraphics[width=0.45\textwidth]{sin_4_2}
+  \includegraphics[width=0.45\textwidth]{sin_4_3}
+  \includegraphics[width=0.45\textwidth]{sin_4_4}
+  \caption{}
+\end{figure}
+
+
+
+
+\subsection{圆}
+
+我们实验的第二个变换是将整个方块变为一个半径为1的圆, 即
+\begin{align}
+	f_x(x,y)&=x/2 \\
+	f_y(x,y)&=y\pi
+\end{align}
+
+\begin{figure}[hbt]
+\centering
+  \includegraphics[width=0.23\textwidth]{circle_1_1}
+  \includegraphics[width=0.23\textwidth]{circle_1_2}
+  \includegraphics[width=0.23\textwidth]{circle_1_3}
+  \includegraphics[width=0.23\textwidth]{circle_1_4}\\
+  \includegraphics[width=0.23\textwidth]{circle_1_5}
+  \includegraphics[width=0.23\textwidth]{circle_1_6}
+  \includegraphics[width=0.23\textwidth]{circle_1_7}
+  \includegraphics[width=0.23\textwidth]{circle_1_71}\\
+  \includegraphics[width=0.23\textwidth]{circle_1_8}
+  \includegraphics[width=0.23\textwidth]{circle_1_81}
+  \includegraphics[width=0.23\textwidth]{circle_1_9}
+  \includegraphics[width=0.23\textwidth]{circle_1_10}  
+  
+  \caption{从左上到右下可以看出我们的变换$f$如何从Unif$[-1,1]^2$生成所需分布$\mathcal U$}
+\end{figure}
+
+
+
+我们可以证明这样变换得到的分布并不是在这个圆上的一个均匀分布. 从图上也可以看出这样的分布下, 数据更有可能处于中心而不是圆的边缘.
+
+\subsection{最后一个}
+
+我们最后一个实验的变换是一个翅膀型(两个螺线拼接), 即
+\begin{align}
+	f_x(x,y) &= \dfrac{x}{2} \cos (3x\pi) \\
+	f_y(x,y) &= \dfrac{x}{2} \sin (3x\pi)
+\end{align}
+
+\begin{figure}[hbt]
+\centering
+  \includegraphics[width=0.23\textwidth]{wings_1_1}
+  \includegraphics[width=0.23\textwidth]{wings_1_2}
+  \includegraphics[width=0.23\textwidth]{wings_1_3}
+  \includegraphics[width=0.23\textwidth]{wings_1_4}
+  \includegraphics[width=0.23\textwidth]{wings_1_5}
+  \includegraphics[width=0.23\textwidth]{wings_1_6}
+  \includegraphics[width=0.23\textwidth]{wings_1_7}
+  \includegraphics[width=0.23\textwidth]{wings_1_8}
+  \includegraphics[width=0.23\textwidth]{wings_1_9}
+  \includegraphics[width=0.23\textwidth]{wings_1_10}
+  \includegraphics[width=0.23\textwidth]{wings_1_11}
+  \includegraphics[width=0.23\textwidth]{wings_1_12}
+
+  
+  \caption{从左上到右下可以看出我们的变换$f$如何从Unif$[-1,1]^2$生成所需分布$\mathcal U$}
+\end{figure}
+
+这个分布在他的支集上也并非一个均匀分布, 我们通过变换的过程的可视化以及理论证明都可以得到相同的结果.
+
+
+\nocite{*}
+
+% 如果想修改参考文献样式（非国标），请把下行取消注释，并换成合适的样式（比如 unsrt，plain 样式）。
+\bibliographystyle{unsrt}
+\bibliography{wpref}
+
+\end{document}
