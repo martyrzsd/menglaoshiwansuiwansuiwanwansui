@@ -109,6 +109,8 @@ GAN通常都会应用在如生成各种各样的图像的问题上. 这些问题
 
 我们得到的是一个在这条曲线上的均匀分布.
 
+\subsubsection{实验结果}
+
 \begin{figure}[hbt]
 \centering
   \includegraphics[width=0.45\textwidth]{sin_2_1}
@@ -121,7 +123,7 @@ GAN通常都会应用在如生成各种各样的图像的问题上. 这些问题
 我们的可视化在训练刚开始的时候收敛的十分迅速, 得到了比较好的结果. 因为我们的函数非常简单, 我们的GAN的表现看似非常满意.
 
 
-\subsection{GAN的混沌性}
+\subsubsection{GAN的混沌性}
 
 但是随着实验的进行, GAN的分类器网络的训练呈现出了极度混沌化的特征. 其分类边界与分类区域出现了多次彻底的反转, 并且其变化呈现出了完全没有规律的特点. 在我们的生成器已经很好地捕捉到了分布的前提下, 我们的分类器却在不断摇摆.
 
@@ -134,17 +136,17 @@ GAN通常都会应用在如生成各种各样的图像的问题上. 这些问题
   \caption{从图上可以看到上下两行的分类器在输入空间中的分类情况在我们的生成器已经习得了需要分布了以后, 发生了彻底的反转. 分类器再经过了几个batch以后彻底推翻了自己之前的结果. 从图上看就是之前是蓝的的地方现在变成了红色, 之前是红色的地方现在变成了蓝色. 下面一行也有着类似的情况.}
 \end{figure}
 
-并且随着训练的进行, 我们的分类器捕捉到的边界反而变得比一开始更加模糊, 之前认为是真实样本的区域完全消失掉了, 同时生成器也出现了较大的波动.
+并且随着训练的进行, 我们的辨别器捕捉到的在样本空间中的分类边界反而变得比一开始更加模糊, 之前认为是真实样本的区域完全消失掉了. 原来样本空间中正弦波样式的分类边界逐渐消失变为了一整个辨别器无法确定真假的长方形区域. 并且我们在输入空间中的辨别器输出大部分都变为了不确定. 同时生成器也出现了较大的波动. 
 
 \begin{figure}[hbt]
-  \includegraphics[width=0.45\textwidth]{sin_4_1}
-  \includegraphics[width=0.45\textwidth]{sin_4_2}
-  \includegraphics[width=0.45\textwidth]{sin_4_3}
-  \includegraphics[width=0.45\textwidth]{sin_4_4}
+  \includegraphics[width=0.45\textwidth]{sin_5_1}
+  \includegraphics[width=0.45\textwidth]{sin_5_2}\\
+  \includegraphics[width=0.45\textwidth]{sin_5_3}
+  \includegraphics[width=0.45\textwidth]{sin_5_4}
   \caption{}
 \end{figure}
 
-
+我们无法明确地解释为什么会出现这样的混沌现象. 但是这的确是GAN的特点之一. 我们认为通过多次实验或者是对超参数的调整可能能够解决这样的问题. 不过这么简单的一个函数的拟合能够反映出来这么多有趣的现象的确是我们没有想到的. GAN的训练的困难可见一斑.
 
 
 \subsection{圆}
@@ -177,7 +179,19 @@ GAN通常都会应用在如生成各种各样的图像的问题上. 这些问题
 
 我们可以证明这样变换得到的分布并不是在这个圆上的一个均匀分布. 从图上也可以看出这样的分布下, 数据更有可能处于中心而不是圆的边缘.
 
-\subsection{最后一个}
+\begin{figure}[hbt]
+  \includegraphics[width=0.45\textwidth]{circle_2_1}
+  \includegraphics[width=0.45\textwidth]{circle_2_2}\\
+  \includegraphics[width=0.45\textwidth]{circle_2_3}
+  \includegraphics[width=0.45\textwidth]{circle_2_4}
+  \caption{我们可以看到我们的生成器生成的样本并非如我们所想的是圆形, 反而是一个蝴蝶型. 并且我们之前观察到的辨别器的输出翻转在右上与左下之间也观察到了类似的现象, 并且其仅相隔一个batch.}
+\end{figure}
+
+我们可以看到我们的生成器并没有像我们想象一样捕捉到圆形分布. 但是它捕捉到了分布的大致范围, 以及分布密度从中间到外围逐渐递减的特点. 其生成的样本因为某种未知的原因呈一个蝴蝶型. 并且其捕捉到这个蝴蝶型的分布十分迅速, 在训练的过程中一直保持着这样的蝴蝶型. 同时在训练结束的时候我们的辨别器基本上处于躺平的状态, 对所有的样本都无法给出有效的判断, 自然也无法对生成器进行有效的有意义的引导.
+
+
+
+\subsection{翅膀型}
 
 我们最后一个实验的变换是一个翅膀型(两个螺线拼接), 即
 \begin{align}
@@ -190,11 +204,11 @@ GAN通常都会应用在如生成各种各样的图像的问题上. 这些问题
   \includegraphics[width=0.23\textwidth]{wings_1_1}
   \includegraphics[width=0.23\textwidth]{wings_1_2}
   \includegraphics[width=0.23\textwidth]{wings_1_3}
-  \includegraphics[width=0.23\textwidth]{wings_1_4}
+  \includegraphics[width=0.23\textwidth]{wings_1_4}\\
   \includegraphics[width=0.23\textwidth]{wings_1_5}
   \includegraphics[width=0.23\textwidth]{wings_1_6}
   \includegraphics[width=0.23\textwidth]{wings_1_7}
-  \includegraphics[width=0.23\textwidth]{wings_1_8}
+  \includegraphics[width=0.23\textwidth]{wings_1_8}\\
   \includegraphics[width=0.23\textwidth]{wings_1_9}
   \includegraphics[width=0.23\textwidth]{wings_1_10}
   \includegraphics[width=0.23\textwidth]{wings_1_11}
@@ -206,6 +220,36 @@ GAN通常都会应用在如生成各种各样的图像的问题上. 这些问题
 
 这个分布在他的支集上也并非一个均匀分布, 我们通过变换的过程的可视化以及理论证明都可以得到相同的结果.
 
+\subsubsection{首先捕捉大范围}
+
+\begin{figure}[hbt]
+\centering
+  \includegraphics[width=0.45\textwidth]{wings_2_1}
+  \includegraphics[width=0.45\textwidth]{wings_2_2}\\
+  \includegraphics[width=0.45\textwidth]{wings_2_3}
+  \includegraphics[width=0.45\textwidth]{wings_2_4}
+  \caption{我们可以看到生成器与辨别器在训练开始先去捕捉了真实样本所处的大致范围, 并且在输入空间的中下部中逐渐出现了一个深红色块(代表着辨别器以很高的置信度将这一片区域判别位了生成样本), 我们可以猜测此时生成器将这部分映射到了样本空间的边角}
+\end{figure}
+
+我们可以看到这次生成器首先去捕捉了大概的样本所处的范围. 同时辨别器也在捕捉真实样本所处的大范围. 并且在输入空间的中下部出现了一个置信度极高的假样本区域(深红色区域), 我们猜测我们的生成器将这部分区域映射到了样本空间的外侧边角.
+
+\subsubsection{再捕捉小区域}
+
+\begin{figure}[hbt]
+  \includegraphics[width=0.33\textwidth]{wings_3_1}
+  \includegraphics[width=0.33\textwidth]{wings_3_2}
+  \includegraphics[width=0.33\textwidth]{wings_3_3}\\
+  \includegraphics[width=0.33\textwidth]{wings_3_4}
+  \includegraphics[width=0.33\textwidth]{wings_3_5}
+  \includegraphics[width=0.33\textwidth]{wings_3_6}\\
+  \includegraphics[width=0.33\textwidth]{wings_3_7}
+  \includegraphics[width=0.33\textwidth]{wings_3_8}
+  \caption{我们可以看到在样本空间中逐渐出现了一个高置信的真实样本区域(深蓝色), 这个区域随着训练的进行从左下角出现然后逐渐延伸到两侧, 再逐渐收小最后达到最终结果. 同时随着这个蓝色区域的出现与收缩, 我们的生成器并没有在这两个蓝色区域相应的位置生成样本.}
+\end{figure}
+
+我们可以看到随着训练的进行, 我们的生成器逐渐捕捉到了分布集中在曲线上这一特点. 并且逐渐有更多的点附着到了曲线上. 而分类器这次的表现十分稳固, 在输入空间上没有出现经过了一个Batch就彻底输出彻底反转的现象. 并且在园内的部分, 真实数据分布在一条曲线上的特征分类器也很好地捕捉到了. 有趣的是观察我们的分类器如何随着我们的生成器捕捉到分类边界. 首先一个高置信度的真实样本区间出现在左下角, 随着训练的进行逐渐右下角也出现了这样的一个真实样本区域, 然后两个区域逐渐分离并向上运动, 最后收缩成为两个翅膀的样子. 与此同时我们的生成器在一开始在两个翅膀的位置还是有生成样本的, 但是随着这两个高置信度真实样本区间的出现与收紧, 他就再也没有生成出任何在这两个翅膀的区域上的样本了. 可以说我们的GAN在这个圆里达到了平衡, 但是在翅膀的部分我们的辨别器完全主宰了我们的生成器. 
+
+同时我们这个时候我们再看之前观测到的那个红色区域, 我们可以发现这个红色区域在此时变成了红色与蓝色交叉的区域, 同时样本空间中的边缘也是红色蓝色相间的. 我们基本上可以断定我们的生成器把这个部分映射到了样本空间的边角上.
 
 \nocite{*}
 
