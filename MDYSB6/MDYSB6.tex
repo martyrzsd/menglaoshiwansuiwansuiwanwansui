@@ -52,7 +52,6 @@ GAN的工作原理来源于博弈论中的零和博弈. 其生成模型与判别
 
 \subsection{训练过程}
 \begin{enumerate}
-
   \item 抽取随机噪声
   \item 通过生成模型来生成数据
   \item 将生成数据与真实数据混合并加上标签
@@ -101,26 +100,23 @@ GAN的理论十分美好, 但是GAN的训练十分困难. 对于一个一般的�
 
 
 \subsection{生成图像}
-在对模型进行少许的调整和训练后, 我们在其众多的结果中挑选出几个较为“漂亮”的图像进行展示. 首先训练生成器生成狗的图像, 如 \figref{fig:dog}
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.2\textwidth]{dog1}
-  \includegraphics[width=.2\textwidth]{dog2}
-  \includegraphics[width=.2\textwidth]{dog3}
-  \includegraphics[width=.2\textwidth]{dog4}
+  \includegraphics[width=.15\textwidth]{dog1}
+  \includegraphics[width=.15\textwidth]{dog2}
+  \includegraphics[width=.15\textwidth]{dog3}
+  \includegraphics[width=.15\textwidth]{dog4}
   \caption{由GAN生成的狗的图像. \label{fig:dog}}
 \end{figure}
-
-\noindent 可以看到, 虽然清晰度并不是十分的高, 而且有的图像上甚至有噪点, 但仍能从大致轮廓以及五官上判断出来是狗的模样. 同样的, 我们还让生成器生成了飞机的图像, 如 \figref{fig:air}
+在对模型进行少许的调整和训练后, 我们在其众多的结果中挑选出几个较为“漂亮”的图像进行展示. 首先训练生成器生成狗的图像, 如 \figref{fig:dog}, 可以看到, 虽然清晰度并不是十分的高, 而且有的图像上甚至有噪点, 但仍能从大致轮廓以及五官上判断出来是狗的模样. 同样的, 我们还让生成器生成了飞机的图像, 如 \figref{fig:air}, 对于飞机图像的生成似乎比狗的要成功一些, 甚至将机翼, 机身, 尾翼等特征都清晰地表现了出来. 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.2\textwidth]{air1}
-  \includegraphics[width=.2\textwidth]{air2}
-  \includegraphics[width=.2\textwidth]{air3}
-  \includegraphics[width=.2\textwidth]{air4}
+  \includegraphics[width=.15\textwidth]{air1}
+  \includegraphics[width=.15\textwidth]{air2}
+  \includegraphics[width=.15\textwidth]{air3}
+  \includegraphics[width=.15\textwidth]{air4}
   \caption{由GAN生成的飞机的图像. \label{fig:air}}
 \end{figure}
-对于飞机图像的生成似乎比狗的要成功一些, 甚至将机翼, 机身, 尾翼等特征都清晰地表现了出来. 
 
 但总体而言, 由于我们对于超参数的调整有限, 网络结构可能也并不是最优, 训练出来的图像并没有达到以假乱真的地步. 同时, 由于训练GAN生成真实图片的花销也比较大, 因此我们接下来将目标转一些特殊函数的图像. 
 \section{GAN的训练过程可视化}
@@ -129,10 +125,14 @@ GAN通常都会应用在如生成各种各样的图像的问题上. 这些问题
 
 因此, 我们考虑了一个更加简单的问题. 即对于一个二维均匀分布噪声$\varepsilon \sim \mathrm{Unif}[-1,1]^2$, 给定一个变换$f:\mathbb [-1,1]^2 \to \mathbb [-1,1]^2$, 构造出另外一个概率分布$\mathcal U$. 然后通过GAN来生成$\mathcal U$, 希望生成器能够替代这样的一个函数$f$, 通过均匀分布生成出经过变换构造出的分布$\mathcal U$.
 
-同时, 我们还在GAN训练完每个Batch之后将其可视化. 生成器和判别器的网络都具有三层全连接层, 使用Leaky ReLu激活. 生成器的的学习率为0.0001, 判别器的学习率为0.001, 优化算法都使用参数$\beta=0.5$下的Adam优化器. 网络架构如图%TODO 图
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{流程}
+    \caption{网络结构示意图. \label{fig:f3}}
+\end{figure}
 
 
-训练结果的 \figref{fig:f1}. 
+同时, 我们还在GAN训练完每个Batch之后将其可视化. 生成器和判别器的网络都具有三层全连接层, 使用Leaky ReLu激活. 生成器的的学习率为0.0001, 判别器的学习率为0.001, 优化算法都使用参数$\beta=0.5$下的Adam优化器. 网络架构如 \figref{fig:f3} 所示. 在此网络上的训练结果如 \figref{fig:f1} 所示. 
 \begin{figure}[htbp]
   \centering
     \includegraphics[width=0.35\textwidth]{sin_2_1}
@@ -148,7 +148,7 @@ GAN通常都会应用在如生成各种各样的图像的问题上. 这些问题
 
 \subsection{正弦波}
 
-我们实验的第一个变换是将整个方块变换为正弦波, 即
+第一个实验是将整个方块变换为正弦波, 即
 \begin{align*}
 	f_x(x,y)=x,\ f_y(x,y)=sin(x)+\dfrac{y}{4}.
 \end{align*}
@@ -169,8 +169,8 @@ GAN通常都会应用在如生成各种各样的图像的问题上. 这些问题
 
 \begin{figure}[htbp]
 \centering
-  \includegraphics[width=0.3\textwidth]{sin_2_1}
-  \includegraphics[width=0.3\textwidth]{sin_2_2}
+  \includegraphics[width=0.35\textwidth]{sin_2_1}
+  \includegraphics[width=0.35\textwidth]{sin_2_2}
   \caption{捕捉大致范围.}
 \end{figure}
 
@@ -218,32 +218,29 @@ GAN通常都会应用在如生成各种各样的图像的问题上. 这些问题
 
 
 \subsection{圆}
-\begin{figure}[btbp]
-  \centering
-  \includegraphics[width=0.15\textwidth]{circle_1_1}
-  \includegraphics[width=0.15\textwidth]{circle_1_2}
-  \includegraphics[width=0.15\textwidth]{circle_1_3}
-  \includegraphics[width=0.15\textwidth]{circle_1_4}
-  \includegraphics[width=0.15\textwidth]{circle_1_5}
-  \includegraphics[width=0.15\textwidth]{circle_1_6}\\
-  \includegraphics[width=0.15\textwidth]{circle_1_7}
-  \includegraphics[width=0.15\textwidth]{circle_1_71}
-  \includegraphics[width=0.15\textwidth]{circle_1_8}
-  \includegraphics[width=0.15\textwidth]{circle_1_81}
-  \includegraphics[width=0.15\textwidth]{circle_1_9}
-  \includegraphics[width=0.15\textwidth]{circle_1_10}
-  \caption{从左上到右下可以看出我们的变换$f$如何从Unif$[-1,1]^2$生成所需分布$\mathcal U$}
-\end{figure}
-
 第二个实验是将整个方块变为一个半径为1的圆, 即
 \begin{align*}
 	f_x(x,y)=\frac{x}{2},\ f_y(x,y)=y\cdot\pi.
 \end{align*}
+可以证明, 这样变换得到的分布并不是在这个圆上的一个均匀分布. 从图上也可以看出这样的分布下, 数据更有可能处于中心而不是圆的边缘. 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.1\textwidth]{circle_1_1}
+  \includegraphics[width=0.1\textwidth]{circle_1_2}
+  \includegraphics[width=0.1\textwidth]{circle_1_3}
+  \includegraphics[width=0.1\textwidth]{circle_1_4}
+  \includegraphics[width=0.1\textwidth]{circle_1_5}
+  \includegraphics[width=0.1\textwidth]{circle_1_6}\\
+  \includegraphics[width=0.1\textwidth]{circle_1_7}
+  \includegraphics[width=0.1\textwidth]{circle_1_71}
+  \includegraphics[width=0.1\textwidth]{circle_1_8}
+  \includegraphics[width=0.1\textwidth]{circle_1_81}
+  \includegraphics[width=0.1\textwidth]{circle_1_9}
+  \includegraphics[width=0.1\textwidth]{circle_1_10}
+  \caption{从左上到右下可以看出我们的变换$f$如何从Unif$[-1,1]^2$生成所需分布$\mathcal U$}
+\end{figure}
 
-可以证明, 这样变换得到的分布并不是在这个圆上的一个均匀分布. 从图上也可以看出这样的分布下, 数据更有可能处于中心而不是圆的边缘.
-
-可以看到, 生成器并没有像我们想象一样捕捉到圆形分布. 而是捕捉到了分布的大致范围, 以及分布密度从中间到外围逐渐递减的特点. 其生成的样本因为某种未知的原因呈一个蝴蝶型. 并且十分迅速地捕捉到了这个蝴蝶型的分布, 并且在训练的过程中一直保持着这样的蝴蝶型. 
-\begin{figure}[hbp]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.3\textwidth]{circle_2_1}
   \includegraphics[width=0.3\textwidth]{circle_2_2}\\
@@ -251,6 +248,7 @@ GAN通常都会应用在如生成各种各样的图像的问题上. 这些问题
   \includegraphics[width=0.3\textwidth]{circle_2_4}
   \caption{\scriptsize 可以看到, 我们的生成器生成的样本并非如我们所想的是圆形, 反而是一个蝴蝶型. 并且之前观察到的判别器的输出在右上与左下之间也观察到了混沌的现象, 其仅相隔一个batch(100个样本), 但判别器却完全推翻之前的结论.}
 \end{figure}
+可以看到, 生成器并没有像我们想象一样捕捉到圆形分布. 而是捕捉到了分布的大致范围, 以及分布密度从中间到外围逐渐递减的特点. 其生成的样本因为某种未知的原因呈一个蝴蝶型. 并且十分迅速地捕捉到了这个蝴蝶型的分布, 并且在训练的过程中一直保持着这样的蝴蝶型. 
 
 在训练结束的时候判别器基本上处于无效的状态, 对所有的样本都无法给出有效的判断, 自然也无法对生成器进行有效的有意义的引导. 我们还注意到, 在训练的过程中, 判别器的行为有着一定的混沌性. 很多次只间隔一个batch就完全地推翻了之前所给出的结果, 如图中所展示的, 红蓝分布在一个batch的训练后发生了彻底的翻转. 
 
@@ -342,10 +340,10 @@ GAN通常都会应用在如生成各种各样的图像的问题上. 这些问题
 
 \begin{figure}[hbt]
 \centering
-  \includegraphics[width=0.22\textwidth]{wings_4_1}
-  \includegraphics[width=0.22\textwidth]{wings_4_2}
-  \includegraphics[width=0.22\textwidth]{wings_4_3}
-  \includegraphics[width=0.22\textwidth]{wings_4_4}
+  \includegraphics[width=0.35\textwidth]{wings_4_1}
+  \includegraphics[width=0.35\textwidth]{wings_4_2}\\
+  \includegraphics[width=0.35\textwidth]{wings_4_3}
+  \includegraphics[width=0.35\textwidth]{wings_4_4}
 \end{figure}
 
 但是尽管如此一直到600个batch以后, 我们的网络依旧还是处在一个无法捕捉大致范围的阶段.
