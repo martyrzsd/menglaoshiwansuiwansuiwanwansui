@@ -35,6 +35,21 @@ GAN的工作原理来源于博弈论中的零和博弈. 其生成模型与判别
 
 而这样的训练过程一旦结束, 对生成器输入一个噪声, 就可以以一个较高的可信度把这个随机噪声转化成一个统计上与真实数据无异的生成数据. 
 
+\begin{figure}[hb]
+    \centering
+    \includegraphics[width=.8\textwidth]{DCGAN}
+    \caption{GAN结构示意图. }
+\end{figure}
+
+\subsubsection*{生成器}
+它将一个向量(噪声)转换为一张图像. 
+\subsubsection*{判别器}
+它接收一张候选图像(真实的或者生成的)作为输入, 并将其划分到这两个类别之中. 
+\subsubsection*{对抗网络}
+对抗网络将生成器和判别器连接在一起. 训练时, 这个模型将让生成器向某个方向移动, 从而提高它欺骗判别器的能力. 综合来说, 它将潜在空间的噪声转换为一个分
+类决策(真或假). 因此, 训练GAN将会更新生成器的权重, 使得判别器在观察假图像时更有可能预测为“真”. 
+
+
 \subsection{训练过程}
 \begin{enumerate}
 
@@ -64,18 +79,26 @@ GAN的理论十分美好, 但是GAN的训练十分困难. 对于一个一般的�
 \end{itemize}
 
 \subsection{网络架构}
-\begin{figure}[hb]
-    \centering
-    \includegraphics[width=.8\textwidth]{DCGAN}
-    \caption{GAN结构示意图. }
+
+结合上述的各种启发性技巧, 我们构建了如下的架构作为我们的网络,
+
+\subsubsection*{辨别器}
+
+\begin{figure}[hbt]
+\centering
+  \includegraphics[width=0.95\textwidth]{Arche_D}
+  \caption{DCGAN辨别器网络架构}
 \end{figure}
+
+
 \subsubsection*{生成器}
-它将一个向量(噪声)转换为一张图像. 
-\subsubsection*{判别器}
-它接收一张候选图像(真实的或者生成的)作为输入, 并将其划分到这两个类别之中. 
-\subsubsection*{对抗网络}
-对抗网络将生成器和判别器连接在一起. 训练时, 这个模型将让生成器向某个方向移动, 从而提高它欺骗判别器的能力. 综合来说, 它将潜在空间的噪声转换为一个分
-类决策(真或假). 因此, 训练GAN将会更新生成器的权重, 使得判别器在观察假图像时更有可能预测为“真”. 
+
+\begin{figure}[hbt]
+\centering
+  \includegraphics[width=0.95\textwidth]{Arche_G}
+  \caption{DCGAN生成器网络架构}
+\end{figure}
+
 
 \subsection{生成图像}
 在对模型进行少许的调整和训练后, 我们在其众多的结果中挑选出几个较为“漂亮”的图像进行展示. 首先训练生成器生成狗的图像, 如 \figref{fig:dog}
@@ -106,7 +129,10 @@ GAN通常都会应用在如生成各种各样的图像的问题上. 这些问题
 
 因此, 我们考虑了一个更加简单的问题. 即对于一个二维均匀分布噪声$\varepsilon \sim \mathrm{Unif}[-1,1]^2$, 给定一个变换$f:\mathbb [-1,1]^2 \to \mathbb [-1,1]^2$, 构造出另外一个概率分布$\mathcal U$. 然后通过GAN来生成$\mathcal U$, 希望生成器能够替代这样的一个函数$f$, 通过均匀分布生成出经过变换构造出的分布$\mathcal U$.
 
-同时, 我们还在GAN训练完每个Batch之后将其可视化. 生成器和判别器的网络都具有一个全连接层, 使用Leaky ReLu激活. 生成器的的学习率为0.0001, 判别器的学习率为0.001, 优化算法都使用参数$\beta=0.5$下的Adam优化器. 训练结果的 \figref{fig:f1}. 
+同时, 我们还在GAN训练完每个Batch之后将其可视化. 生成器和判别器的网络都具有三层全连接层, 使用Leaky ReLu激活. 生成器的的学习率为0.0001, 判别器的学习率为0.001, 优化算法都使用参数$\beta=0.5$下的Adam优化器. 网络架构如图%TODO 图
+
+
+训练结果的 \figref{fig:f1}. 
 \begin{figure}[htbp]
   \centering
     \includegraphics[width=0.35\textwidth]{sin_2_1}
